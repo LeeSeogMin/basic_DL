@@ -1,0 +1,14 @@
+{
+  "file": "2-1-hello-ai.py",
+  "chapter_relpath": "practice/chapter2/code/2-1-hello-ai.py",
+  "started_at": "2026-07-05T19:29:26.037576+09:00",
+  "duration_sec": 0.02,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.14.6",
+  "platform": "macOS-14.3.1-arm64-arm-64bit-Mach-O",
+  "source_sha256": "f8aa8c5907985ed2ebc5030d6c82dbf39ac8e7377a7f38d0e41dbeb5af15ee8d",
+  "output_sha256": "2733ef74400509e2ed1e5ee03a0b9b956c206b5bbf878312f24b823c6aaa5692",
+  "output_log": "practice/chapter2/results/2-1-hello-ai.log"
+}

@@ -1,0 +1,18 @@
+# Common packages for 딥러닝 기초 practice code.
+# Install from the project root:
+#   python3 -m pip install -r practice/requirements.txt
+
+numpy>=1.26
+pandas>=2.0
+matplotlib>=3.8
+scikit-learn>=1.4
+scipy>=1.11
+jupyter>=1.0
+ipykernel>=6.0
+python-dotenv>=1.0
+
+# Deep learning frameworks are intentionally optional because they are heavy
+# and may differ by machine/semester. Uncomment the one used in a chapter.
+# torch>=2.3
+# torchvision>=0.18
+# tensorflow>=2.16

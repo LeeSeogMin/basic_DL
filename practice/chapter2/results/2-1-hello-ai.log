@@ -1,0 +1,15 @@
+$ /Users/callii/Documents/class/2026-2/basic_DL/.venv/bin/python 2-1-hello-ai.py
+
+=== STDOUT ===
+=== 2주차 첫 Python 실행 ===
+민지 학생은 이미지 분류에 관심이 있으며, 오늘의 목표는 'AI가 만든 코드를 실행하고 검증하기'이다.
+
+=== 실행 환경 ===
+Python: 3.14.6
+Platform: Darwin 23.3.0
+
+=== 안전 점검 ===
+- 비밀번호, API 키, 개인정보를 코드에 넣지 않았다.
+- AI가 만든 코드라도 직접 실행해서 결과를 확인해야 한다.
+
+=== STDERR ===

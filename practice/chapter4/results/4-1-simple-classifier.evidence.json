@@ -1,0 +1,14 @@
+{
+  "file": "4-1-simple-classifier.py",
+  "chapter_relpath": "practice/chapter4/code/4-1-simple-classifier.py",
+  "started_at": "2026-07-05T19:43:58.560057+09:00",
+  "duration_sec": 7.74,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.14.6",
+  "platform": "macOS-14.3.1-arm64-arm-64bit-Mach-O",
+  "source_sha256": "95e119069f01a2c4376a5a71d6a26c0d21a5b86bd1f9ec90064d9c90fe5a8f66",
+  "output_sha256": "1f96590c8b83443abb74cb0c57d0ea8fc46a5e60f787fcaca817dc64c30eb5f1",
+  "output_log": "practice/chapter4/results/4-1-simple-classifier.log"
+}
