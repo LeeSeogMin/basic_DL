@@ -1,0 +1,14 @@
+{
+  "file": "9-1-image-classifier.py",
+  "chapter_relpath": "practice/chapter9/code/9-1-image-classifier.py",
+  "started_at": "2026-08-13T19:43:53.932004+09:00",
+  "duration_sec": 1.94,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.14.6",
+  "platform": "macOS-14.3.1-arm64-arm-64bit-Mach-O",
+  "source_sha256": "dfe51bba40d29decaedae9afb9b151a461d42d5c15e296453a59ebe8191c4456",
+  "output_sha256": "9865cc572fd073893c243963e976d18c85d77303742c866f09870148258a04d3",
+  "output_log": "practice/chapter9/results/9-1-image-classifier.log"
+}

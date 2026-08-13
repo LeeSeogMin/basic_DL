@@ -1,0 +1,11 @@
+test_index,true_label,predicted,confidence,correct
+68,0,0,1.0,True
+431,1,1,1.0,True
+325,2,2,0.9999,True
+200,3,3,1.0,True
+209,4,4,1.0,True
+475,5,5,0.973,True
+35,6,6,0.9982,True
+359,7,7,1.0,True
+214,8,8,0.9985,True
+62,9,9,0.9999,True

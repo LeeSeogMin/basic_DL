@@ -1,0 +1,14 @@
+{
+  "file": "12-1-ai-coded-tool.py",
+  "chapter_relpath": "practice/chapter12/code/12-1-ai-coded-tool.py",
+  "started_at": "2026-08-13T19:46:06.570294+09:00",
+  "duration_sec": 0.3,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.14.6",
+  "platform": "macOS-14.3.1-arm64-arm-64bit-Mach-O",
+  "source_sha256": "1c964de34c434597c96fab2cb207650160a153e288cd2f38b2a66aeeac63c6f8",
+  "output_sha256": "56ccd51154eaf0a8d12b16b351f019735b0a771dc3eb2ec0c972a150c443079d",
+  "output_log": "practice/chapter12/results/12-1-ai-coded-tool.log"
+}

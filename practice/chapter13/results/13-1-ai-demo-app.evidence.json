@@ -1,0 +1,14 @@
+{
+  "file": "13-1-ai-demo-app.py",
+  "chapter_relpath": "practice/chapter13/code/13-1-ai-demo-app.py",
+  "started_at": "2026-08-13T19:46:22.199870+09:00",
+  "duration_sec": 0.83,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.14.6",
+  "platform": "macOS-14.3.1-arm64-arm-64bit-Mach-O",
+  "source_sha256": "338031fdfe2c78a49d206d4cc0da5302627c8523482735510b700037fdbca11a",
+  "output_sha256": "be3cdf0f82260bc526076b8df3d05235234fe70701a649ca880742f3080fc333",
+  "output_log": "practice/chapter13/results/13-1-ai-demo-app.log"
+}

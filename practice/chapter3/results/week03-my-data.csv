@@ -1,0 +1,11 @@
+name,movie,food,music,sports,game,recommendation
+Student_A,1,4,4,3,3,Music lover
+Student_B,5,1,4,2,1,Music lover
+Student_C,3,5,4,4,4,Active foodie
+Student_D,4,3,1,5,3,Explorer
+Student_E,3,2,1,5,4,Explorer
+Student_F,4,3,5,3,3,Music lover
+Student_G,3,2,1,3,5,Explorer
+Student_H,1,5,5,2,4,Music lover
+Student_I,1,4,4,2,1,Music lover
+Student_J,5,3,5,4,4,SF fan
