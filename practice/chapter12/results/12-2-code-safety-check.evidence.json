@@ -1,0 +1,14 @@
+{
+  "file": "12-2-code-safety-check.py",
+  "chapter_relpath": "practice\\chapter12\\code\\12-2-code-safety-check.py",
+  "started_at": "2026-08-24T20:51:21.693339+09:00",
+  "duration_sec": 1.63,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "9ea9994566a3128624f32445ee0d9358a28bf35db366bfcb265e88a7289ef1a0",
+  "output_sha256": "dbca50ece73287d53865e97313d476263b5091cf3c16ae73db1367e91eede0b8",
+  "output_log": "practice\\chapter12\\results\\12-2-code-safety-check.log"
+}

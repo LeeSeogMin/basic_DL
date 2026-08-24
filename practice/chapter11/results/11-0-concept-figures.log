@@ -1,0 +1,15 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 11-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 11장 개념 그림 생성 ===
+학습 문장은 코드 안에 넣은 합성 한국어 문장이다. 외부 API를 쓰지 않는다.
+
+저장: results/fig11-1-next-token-loop.png  (다음 단어 예측이 되풀이되어 문장이 되는 과정)
+저장: results/fig11-2-sharp-vs-flat.png  (확률 분포가 뾰족할 때와 평평할 때)
+저장: results/fig11-3-where-hallucination.png  (환각이 생기는 자리)
+
+fig11-2의 막대 높이는 합성 학습 문장에서 센 실제 확률이다.
+fig11-1과 fig11-3은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

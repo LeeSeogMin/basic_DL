@@ -1,14 +1,14 @@
 {
   "file": "4-1-simple-classifier.py",
-  "chapter_relpath": "practice/chapter4/code/4-1-simple-classifier.py",
-  "started_at": "2026-07-05T19:43:58.560057+09:00",
-  "duration_sec": 7.74,
+  "chapter_relpath": "practice\\chapter4\\code\\4-1-simple-classifier.py",
+  "started_at": "2026-08-24T17:55:22.423761+09:00",
+  "duration_sec": 2.74,
   "exit_code": 0,
   "timed_out": false,
   "success": true,
-  "python_version": "3.14.6",
-  "platform": "macOS-14.3.1-arm64-arm-64bit-Mach-O",
-  "source_sha256": "95e119069f01a2c4376a5a71d6a26c0d21a5b86bd1f9ec90064d9c90fe5a8f66",
-  "output_sha256": "1f96590c8b83443abb74cb0c57d0ea8fc46a5e60f787fcaca817dc64c30eb5f1",
-  "output_log": "practice/chapter4/results/4-1-simple-classifier.log"
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "cc2ec7b21d75080aca117b1cb0d524bfd457eb61bc04b0c032a480f92039863c",
+  "output_sha256": "7ab128d66a0439d208c16dcd195c80c1d44c2608df667eca0448e151d3ecfd7b",
+  "output_log": "practice\\chapter4\\results\\4-1-simple-classifier.log"
 }

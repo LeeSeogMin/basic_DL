@@ -1,0 +1,12 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 7-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 7장 개념 그림 생성 ===
+저장: results/fig7-1-three-fits.png  (과소적합 · 알맞음 · 과적합 비교)
+저장: results/fig7-2-generalization-gap.png  (훈련 오차와 검증 오차가 벌어지는 지점)
+저장: results/fig7-3-three-way-split.png  (훈련 · 검증 · 테스트 세 갈래 분할)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

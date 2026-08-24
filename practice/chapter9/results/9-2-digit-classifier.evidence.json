@@ -1,0 +1,14 @@
+{
+  "file": "9-2-digit-classifier.py",
+  "chapter_relpath": "practice\\chapter9\\code\\9-2-digit-classifier.py",
+  "started_at": "2026-08-24T20:23:43.589348+09:00",
+  "duration_sec": 3.27,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "0296ea71652e439c90b2a33333b625569c5cbb20810509676e56f6eba774fc5b",
+  "output_sha256": "b467e7356abcea384be37eb51f3a0fdcf92aa99b9991e9b9385160f68d20220d",
+  "output_log": "practice\\chapter9\\results\\9-2-digit-classifier.log"
+}

@@ -1,0 +1,13 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 13-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 13장 개념 그림 생성 ===
+저장: results/fig13-1-model-vs-app.png  (모델을 돌리는 것과 남이 쓸 수 있게 만드는 것)
+저장: results/fig13-2-output-honesty.png  (나쁜 출력과 좋은 출력)
+저장: results/fig13-3-reproducible-run.png  (남이 실행하지 못하는 코드와 실행할 수 있는 코드)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+실제 수치는 실습 13.1과 13.2의 로그에서 인용한다.
+
+=== STDERR ===

@@ -1,0 +1,14 @@
+{
+  "file": "4-2-accuracy-trap.py",
+  "chapter_relpath": "practice\\chapter4\\code\\4-2-accuracy-trap.py",
+  "started_at": "2026-08-24T17:55:25.161941+09:00",
+  "duration_sec": 2.69,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "400fc923eb4d629db67a3d4b8173546b2f6d14e81f84d1fa0fad17872070c589",
+  "output_sha256": "a48d3bef2a587eea5ef5cbd49ddeef718a20997f34e0dd2b48e6f23128ffb556",
+  "output_log": "practice\\chapter4\\results\\4-2-accuracy-trap.log"
+}

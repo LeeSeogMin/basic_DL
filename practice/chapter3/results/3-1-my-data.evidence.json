@@ -1,0 +1,14 @@
+{
+  "file": "3-1-my-data.py",
+  "chapter_relpath": "practice\\chapter3\\code\\3-1-my-data.py",
+  "started_at": "2026-08-24T21:19:49.414514+09:00",
+  "duration_sec": 2.59,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "11da09fb5ae3e4f9de701d6b9be8e9ec6f1a4f52e2dda43b42c995269d0709f1",
+  "output_sha256": "8fb95d3ea88aabc4dd18081658ea2293873b9b044fd90cfc4a1881ec8673df97",
+  "output_log": "practice\\chapter3\\results\\3-1-my-data.log"
+}

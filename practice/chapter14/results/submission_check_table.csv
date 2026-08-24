@@ -1,0 +1,13 @@
+﻿폴더,번호,점검 항목,결과,근거
+example_project,1,실행되는 파이썬 파일이 있는가,통과,.py 1개 모두 문법 오류 없음
+example_project,2,결과 파일이 있는가,통과,"결과 파일 2개 - results/run.log, results/scores.csv"
+example_project,3,데이터 또는 입력 예시가 있는가,통과,입력 파일 1개 - data/input_example.csv
+example_project,4,코드에 비밀키가 적혀 있지 않은가,통과,키처럼 보이는 문자열을 찾지 못했다
+example_project,5,데이터에 실명·연락처·학번이 없는가,통과,개인정보처럼 보이는 문자열을 찾지 못했다
+example_project,6,사용 방법을 적은 파일이 있는가,통과,README.md
+example_project_rough,1,실행되는 파이썬 파일이 있는가,미통과,.py 2개 중 문법 오류 1개 - half_written.py:8
+example_project_rough,2,결과 파일이 있는가,미통과,그림·로그도 없고 results 폴더도 없다
+example_project_rough,3,데이터 또는 입력 예시가 있는가,통과,입력 파일 1개 - participants.csv
+example_project_rough,4,코드에 비밀키가 적혀 있지 않은가,미통과,2곳 - app.py:5 코드에 값이 그대로 적힌 키·비밀번호 / app.py:6 코드에 값이 그대로 적힌 키·비밀번호
+example_project_rough,5,데이터에 실명·연락처·학번이 없는가,미통과,4곳 - participants.csv:1 이름·학번을 담는 열 이름 / participants.csv:2 휴대폰 번호 형태
+example_project_rough,6,사용 방법을 적은 파일이 있는가,미통과,README 또는 사용법 파일이 없다

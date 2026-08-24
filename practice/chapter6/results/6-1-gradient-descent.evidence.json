@@ -1,0 +1,14 @@
+{
+  "file": "6-1-gradient-descent.py",
+  "chapter_relpath": "practice\\chapter6\\code\\6-1-gradient-descent.py",
+  "started_at": "2026-08-24T20:26:22.524458+09:00",
+  "duration_sec": 1.63,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "2235321ebd35331ff1b0f4347227c54d10dcdce6d24b6e4b8580577f9eb687ba",
+  "output_sha256": "d2993c55f7e28e1d813281acca8aad8c42f60a728e8e00b25ba8a77481e760d0",
+  "output_log": "practice\\chapter6\\results\\6-1-gradient-descent.log"
+}

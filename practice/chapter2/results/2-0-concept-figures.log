@@ -1,0 +1,12 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 2-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 2장 개념 그림 생성 ===
+저장: results/fig2-1-code-to-result.png  (코드가 결과로 바뀌기까지의 흐름)
+저장: results/fig2-2-error-reading.png  (오류 메시지 읽는 순서)
+저장: results/fig2-3-ai-boundary.png  (AI가 대신하는 일과 내가 책임지는 일)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

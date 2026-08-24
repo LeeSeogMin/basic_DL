@@ -1,0 +1,13 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 1-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 1장 개념 그림 생성 ===
+저장: results/fig1-1-ai-ml-dl.png  (인공지능·머신러닝·딥러닝 포함 관계와 생성형 AI의 자리)
+저장: results/fig1-2-rule-to-data.png  (규칙을 쓰던 방식에서 데이터로 배우는 방식으로)
+저장: results/fig1-3-good-and-bad.png  (AI가 잘하는 일과 못하는 일을 가르는 두 기준)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+1주차 실습 두 개는 브라우저에서 하므로 실습용 파이썬 코드가 없다.
+
+=== STDERR ===

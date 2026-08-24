@@ -1,0 +1,14 @@
+{
+  "file": "12-1-spec-to-tool.py",
+  "chapter_relpath": "practice\\chapter12\\code\\12-1-spec-to-tool.py",
+  "started_at": "2026-08-24T20:51:20.032737+09:00",
+  "duration_sec": 1.66,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "41a2b0dbc1498b56b3d7c28461989e5f648f3c58e963234a00c16f0c5b84ee73",
+  "output_sha256": "3a5dd58540da3ae3d5942b7943022107596dbd4102a3e5e13a1dc29b1cab0a05",
+  "output_log": "practice\\chapter12\\results\\12-1-spec-to-tool.log"
+}

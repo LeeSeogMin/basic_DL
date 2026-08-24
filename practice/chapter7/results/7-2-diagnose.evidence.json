@@ -1,0 +1,14 @@
+{
+  "file": "7-2-diagnose.py",
+  "chapter_relpath": "practice\\chapter7\\code\\7-2-diagnose.py",
+  "started_at": "2026-08-24T21:17:00.697158+09:00",
+  "duration_sec": 3.07,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "d39f29729fc928d1e9d9bc59362a62a49f0d7c8ab26833f993a7523b4994aa96",
+  "output_sha256": "74b23f2e7c7e5498a03659fbfd7b1a742c9d23cff8b6cc6147acad501b6ed068",
+  "output_log": "practice\\chapter7\\results\\7-2-diagnose.log"
+}

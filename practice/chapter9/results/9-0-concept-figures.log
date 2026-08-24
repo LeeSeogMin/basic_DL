@@ -1,0 +1,13 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 9-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 9장 개념 그림 생성 ===
+저장: results/fig9-1-pixel-and-channel.png  (픽셀과 채널)
+저장: results/fig9-2-convolution-step.png  (합성곱 한 번의 계산)
+저장: results/fig9-3-pooling.png  (pooling이 하는 일)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+그림 안의 숫자는 설명을 위해 손으로 고른 값이다.
+
+=== STDERR ===

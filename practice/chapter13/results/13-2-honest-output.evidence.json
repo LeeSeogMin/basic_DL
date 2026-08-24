@@ -1,0 +1,14 @@
+{
+  "file": "13-2-honest-output.py",
+  "chapter_relpath": "practice\\chapter13\\code\\13-2-honest-output.py",
+  "started_at": "2026-08-24T20:47:54.917066+09:00",
+  "duration_sec": 3.04,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "61bcaf7a616612b18b39660157d0af791bc59b7e414b634c13650bc6e5747be5",
+  "output_sha256": "6d1d491d28cec81cebe2abd1f1da1469539cdf8535628838649f3dd79d1b7d76",
+  "output_log": "practice\\chapter13\\results\\13-2-honest-output.log"
+}

@@ -1,0 +1,14 @@
+{
+  "file": "11-1-next-word.py",
+  "chapter_relpath": "practice\\chapter11\\code\\11-1-next-word.py",
+  "started_at": "2026-08-24T20:43:02.338309+09:00",
+  "duration_sec": 1.12,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "d3d8936f76f27d5fc881902afc68a6853253fb01e622ea80c353663913927cbf",
+  "output_sha256": "481de16c83c9c297c80a3d7bac9b34f2431dbd3093202d94c36c818a7ce8cfb2",
+  "output_log": "practice\\chapter11\\results\\11-1-next-word.log"
+}

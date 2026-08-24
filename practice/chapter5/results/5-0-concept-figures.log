@@ -1,0 +1,19 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 5-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 5장 개념 그림 생성 ===
+저장: results/fig5-1-neuron-anatomy.png  (뉴런 하나의 구조)
+저장: results/fig5-2-why-activation.png  (활성화 함수가 없으면 층을 쌓아도 직선 하나)
+저장: results/fig5-3-folding-layers.png  (층을 쌓으면 판단 영역이 접힌다)
+
+=== 그림 5-2, 5-3에 쓴 신경망의 XOR 네 점 판정 ===
+  x1   x2    정답      활성화 없음    ReLU 사용
+   0    0     0           1          0
+   0    1     1           1          1
+   1    0     1           1          1
+   1    1     0           0          0
+
+이 그림은 개념 설명용이며, 학습으로 찾은 가중치가 아니라 손으로 정한 가중치다.
+
+=== STDERR ===

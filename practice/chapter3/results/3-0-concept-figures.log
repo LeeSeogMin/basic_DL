@@ -1,0 +1,12 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 3-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 3장 개념 그림 생성 ===
+저장: results/fig3-1-list-dict-table.png  (리스트·딕셔너리·표의 대응)
+저장: results/fig3-2-feature-label.png  (표에서 특성과 라벨 구분하기)
+저장: results/fig3-3-bad-data-four.png  (나쁜 데이터의 네 가지 모습)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

@@ -1,0 +1,13 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 10-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 10장 개념 그림 생성 ===
+저장: results/fig10-1-text-to-vector.png  (문장에서 숫자 벡터까지의 네 단계)
+저장: results/fig10-2-bag-of-words.png  (단어 가방 표의 생김새)
+저장: results/fig10-3-sentence-space.png  (뜻이 비슷한 문장이 가까이 모이는 평면)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+그림에 쓰인 문장은 직접 만든 합성 문장이다.
+
+=== STDERR ===

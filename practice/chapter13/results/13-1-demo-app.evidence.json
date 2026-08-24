@@ -1,0 +1,14 @@
+{
+  "file": "13-1-demo-app.py",
+  "chapter_relpath": "practice\\chapter13\\code\\13-1-demo-app.py",
+  "started_at": "2026-08-24T20:47:51.770159+09:00",
+  "duration_sec": 3.14,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "d85318c4d9b8d159b9df309ca9b6026daa11bd96567a97e20620c6edfd815368",
+  "output_sha256": "d3aa25b691b86e1615481d63743c6ffc92f8a4b2706b5bf4e0386567b9cda8e3",
+  "output_log": "practice\\chapter13\\results\\13-1-demo-app.log"
+}

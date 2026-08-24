@@ -1,0 +1,14 @@
+{
+  "file": "10-2-sentiment.py",
+  "chapter_relpath": "practice\\chapter10\\code\\10-2-sentiment.py",
+  "started_at": "2026-08-24T20:41:08.491230+09:00",
+  "duration_sec": 3.4,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "ddf5309287572a559f0c2f73338016a75c08a97fe622cf6b20daada9939a3fc2",
+  "output_sha256": "cf81b91d9c7d78acf3c36fecac7f54137ade3f7650ad4e2300decbf1406f3477",
+  "output_log": "practice\\chapter10\\results\\10-2-sentiment.log"
+}

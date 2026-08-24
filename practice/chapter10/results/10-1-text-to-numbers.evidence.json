@@ -1,0 +1,14 @@
+{
+  "file": "10-1-text-to-numbers.py",
+  "chapter_relpath": "practice\\chapter10\\code\\10-1-text-to-numbers.py",
+  "started_at": "2026-08-24T20:41:05.855431+09:00",
+  "duration_sec": 2.62,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "abedbb5a08eba42b051614f484078c5b19a0e3d73cea41359b6788584731636e",
+  "output_sha256": "bda70fad635b9c417d134b646a045c6aa9652244cd4f3cd8cfa9cb25d8041d99",
+  "output_log": "practice\\chapter10\\results\\10-1-text-to-numbers.log"
+}

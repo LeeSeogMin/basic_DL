@@ -1,0 +1,12 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 4-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 4장 개념 그림 생성 ===
+저장: results/fig4-1-rule-vs-learning.png  (규칙 기반 방식과 머신러닝 방식 비교)
+저장: results/fig4-2-train-test-split.png  (훈련 데이터와 테스트 데이터 분할)
+저장: results/fig4-3-confusion-guide.png  (혼동행렬 칸 이름표)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===
