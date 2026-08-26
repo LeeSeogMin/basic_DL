@@ -9,8 +9,10 @@ __pycache__/
 node_modules/
 dist/
 build/
-schema/
 .claude/
 
 checklists/
+contents.md
+harness.md
+
 

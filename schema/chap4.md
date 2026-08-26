@@ -80,3 +80,9 @@ python scripts/run_and_capture.py 4 --verify
 
 1. `results/decision_boundary.png`
 2. `results/confusion_matrix.png`
+
+## 8. 책임 있는 AI 체크
+
+`docs/ch4.md`의 `### 책임 있는 AI 체크` 절에 제출 전 점검 표를 둔다. 이 장에서 배운 것은 "정확도 한 숫자를 그대로 믿지 않는다"이다. 제출물에도 그대로 적용한다.
+
+점검 항목: 기준선 비교, 정확도 과장, 오류 방향, 틀린 사례, 선택 근거, AI 답변 검증
