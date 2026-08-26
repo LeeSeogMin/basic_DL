@@ -1,0 +1,8 @@
+{
+  "project": "sample-tool",
+  "seed": 42,
+  "batch_size": 32,
+  "epochs": 5,
+  "output_dir": "results",
+  "note": "합성 예제 설정 파일. 실제 프로젝트 설정이 아니다."
+}

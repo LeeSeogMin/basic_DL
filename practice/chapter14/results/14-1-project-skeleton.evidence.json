@@ -1,0 +1,14 @@
+{
+  "file": "14-1-project-skeleton.py",
+  "chapter_relpath": "practice\\chapter14\\code\\14-1-project-skeleton.py",
+  "started_at": "2026-08-24T20:49:59.166256+09:00",
+  "duration_sec": 2.88,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "6be6517cbc10ffe365f0a9459fde5a8504c74df3913569c3455ee1da590342e9",
+  "output_sha256": "49cb5dbe2488a4f350f00f58da2aea8556933199c52d7edf3378225e6f52f178",
+  "output_log": "practice\\chapter14\\results\\14-1-project-skeleton.log"
+}

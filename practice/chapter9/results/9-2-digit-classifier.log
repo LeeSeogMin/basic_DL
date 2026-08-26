@@ -1,0 +1,59 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 9-2-digit-classifier.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 데이터 ===
+scikit-learn load_digits() - 실제 손글씨를 스캔해 만든 공개 데이터
+전체 1797장 = 훈련 1257장 + 테스트 540장
+입력: 8x8 이미지를 한 줄로 펴서 숫자 64개
+정답 종류: 10가지 (숫자 0~9)
+
+=== 모델 설정 ===
+은닉층 뉴런 수: 32
+학습 반복 횟수(max_iter): 60
+난수 seed: 42
+
+=== 학습 중 나온 경고 ===
+[ConvergenceWarning] Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+
+max_iter를 작게 잡아서 나온 경고다. 학습을 더 돌리면 정확도가 조금 더 오른다.
+이 실습은 수업 시간 안에 끝나는 것을 우선해 경고를 감수한다.
+
+=== 정확도 ===
+기준선(가장 많은 숫자로만 답하기)            0.102
+훈련 데이터                         0.960
+테스트 데이터                        0.933
+학습 반복 실제 횟수: 60회
+
+=== 혼동행렬 (가로: 예측, 세로: 정답) ===
+정답\예측    0    1    2    3    4    5    6    7    8    9
+       0   53    0    0    0    1    0    0    0    0    0
+       1    0   46    0    0    0    1    0    0    4    4
+       2    0    2   51    0    0    0    0    0    0    0
+       3    0    0    1   53    0    0    0    0    1    0
+       4    0    0    0    0   52    0    0    1    1    0
+       5    0    0    0    0    0   52    0    0    0    3
+       6    0    0    0    0    0    0   53    0    1    0
+       7    0    0    0    0    0    0    0   54    0    0
+       8    0    8    0    0    0    1    0    1   42    0
+       9    0    0    0    0    1    0    0    4    1   48
+
+=== 자주 헷갈린 짝 ===
+   정답     예측     건수
+    8      1      8
+    9      7      4
+    1      9      4
+    1      8      4
+    5      9      3
+    2      1      2
+
+테스트 540장 중 틀린 것 36장
+
+=== 저장된 결과 ===
+혼동행렬 그림: results/confusion_matrix.png
+실패 갤러리(12장): results/failure_gallery.png
+틀린 목록: results/misclassified_digits.csv
+
+HIDDEN_SIZE와 MAX_ITER를 바꿔 다시 실행하면 정확도와 실패 갤러리가 달라진다.
+
+=== STDERR ===

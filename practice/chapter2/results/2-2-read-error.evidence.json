@@ -1,0 +1,14 @@
+{
+  "file": "2-2-read-error.py",
+  "chapter_relpath": "practice\\chapter2\\code\\2-2-read-error.py",
+  "started_at": "2026-08-24T20:22:11.981897+09:00",
+  "duration_sec": 1.01,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "65907f9893910f4b8cb00a335dcd29d5ba183723443fddbcac2116a9907c1ad8",
+  "output_sha256": "5bf2e4715a40f0147efd971725ca85e37c3cd9199257d5299e1dd7238e352235",
+  "output_log": "practice\\chapter2\\results\\2-2-read-error.log"
+}

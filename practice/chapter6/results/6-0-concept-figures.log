@@ -1,0 +1,14 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 6-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 6장 개념 그림 생성 ===
+저장: results/fig6-1-what-is-loss.png  (손실을 하나의 숫자로 모으는 과정)
+  예시 5개의 차이: [-0.5  0.8 -0.5  1.0 -0.1]
+  차이를 제곱해 평균 낸 값(손실): 0.43
+저장: results/fig6-2-one-step.png  (경사하강법의 한 걸음)
+저장: results/fig6-3-epoch-batch.png  (epoch와 batch의 관계)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

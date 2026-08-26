@@ -1,0 +1,14 @@
+{
+  "file": "6-2-learning-rate.py",
+  "chapter_relpath": "practice\\chapter6\\code\\6-2-learning-rate.py",
+  "started_at": "2026-08-24T20:26:24.161739+09:00",
+  "duration_sec": 1.84,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "979c6fde05d6b83f773165ce6c4e769967341f8316e42459595f53cc4b0ee624",
+  "output_sha256": "2d971510f84e984437b1336dab096b299ade333fb074d42081ca747101bb365f",
+  "output_log": "practice\\chapter6\\results\\6-2-learning-rate.log"
+}

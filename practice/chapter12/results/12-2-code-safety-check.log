@@ -1,0 +1,57 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 12-2-code-safety-check.py
+
+=== STDOUT ===
+=== 실습 12.2 실행 전 코드 안전 점검 ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+검사 대상은 합성 예제 파일이다. 실제 프로젝트 코드가 아니다.
+이 도구는 대상 파일을 텍스트로 읽기만 한다. 실행하지도 import 하지도 않는다.
+특히 _sample_risky.py 는 한 줄도 실행하지 않는다.
+
+=== 검사 대상 ===
+파일                   길이  발견
+--------------------  -----  ----
+_sample_safe.py        46줄   1건
+_sample_risky.py       81줄   9건
+12-1-spec-to-tool.py  317줄   2건
+
+=== 찾은 위험 신호 ===
+위험도  신호               파일                   줄  코드
+------  -----------------  --------------------  ---  --------------------------------------------
+높음    파일 삭제          _sample_risky.py       49  os.remove(leftover)
+높음    파일 삭제          _sample_risky.py       50  shutil.rmtree(WORK_DIR)
+높음    외부 전송          _sample_risky.py       59  requests.post(UPLOAD_URL, json=payload, hea…
+높음    외부 전송          _sample_risky.py       60  urllib.request.urlopen(UPLOAD_URL + "?ping=…
+높음    셸 명령 실행       _sample_risky.py       69  os.system("tar -czf backup.tar.gz " + folde…
+높음    셸 명령 실행       _sample_risky.py       70  subprocess.run("echo " + folder_name, shell…
+높음    멈추지 않는 반복   _sample_risky.py       79  while True:  (멈추는 문장 없음)
+중간    하드코딩된 비밀키  _sample_risky.py       35  API_KEY = "***"
+중간    하드코딩된 비밀키  _sample_risky.py       36  DB_PASSWORD = "***"
+낮음    파일 쓰기          12-1-spec-to-tool.py  184  fig.savefig(out_path, dpi=160)
+낮음    파일 쓰기          12-1-spec-to-tool.py  289  table.to_csv(csv_path, index=False, encodin…
+낮음    파일 쓰기          _sample_safe.py        42  summary.to_csv(OUTPUT_CSV, index=False, enc…
+
+=== 파일별 집계 ===
+파일                  높음  중간  낮음  합계  판정
+--------------------  ----  ----  ----  ----  ------------------------
+_sample_safe.py          0     0     1     1  높음 신호 없음
+_sample_risky.py         7     2     0     9  실행 전 사람이 읽어야 함
+12-1-spec-to-tool.py     0     0     2     2  높음 신호 없음
+
+=== 신호 종류별 집계 ===
+신호               위험도  건수  왜 위험한가
+-----------------  ------  ----  --------------------------------------------------------------------------------
+파일 삭제          높음       2  지운 파일은 되돌릴 수 없다. 어느 경로를 지우는지 사람이 확인해야 한다
+외부 전송          높음       2  무엇이 밖으로 나가는지 코드만 봐서는 모른다. 개인정보·비밀키가 실려 나갈 수 있다
+셸 명령 실행       높음       2  문자열을 붙여 만든 명령은 붙인 내용에 따라 다른 명령까지 실행한다
+하드코딩된 비밀키  중간       2  코드에 적힌 키는 코드를 복사하는 모든 사람에게 함께 복사된다
+멈추지 않는 반복   높음       1  멈추는 조건이 없으면 사람이 강제로 끄기 전까지 돈다(멈추는 문장이 없으면 높음)
+파일 쓰기          낮음       3  어느 경로에 쓰는지 확인한다. 자기 결과 폴더에 쓰는 것이면 문제가 아니다
+
+=== 저장된 결과 ===
+발견 목록: results/safety_findings.csv
+막대그래프: results/safety_report.png
+
+'높음' 신호 7건. 이 줄들은 실행 전에 사람이 직접 읽어야 한다.
+이 도구는 판단하지 않는다. 판단할 자리를 표시할 뿐이다.
+
+=== STDERR ===

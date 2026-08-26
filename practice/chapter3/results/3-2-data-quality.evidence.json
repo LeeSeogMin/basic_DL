@@ -1,0 +1,14 @@
+{
+  "file": "3-2-data-quality.py",
+  "chapter_relpath": "practice\\chapter3\\code\\3-2-data-quality.py",
+  "started_at": "2026-08-24T21:19:52.004250+09:00",
+  "duration_sec": 1.87,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "3fffd9493944be984f66b96f3dc1f4e4d2d8e14d0a126773a74eb24338a3fce1",
+  "output_sha256": "b09b71c381a5eb1a74bd127fd519922b6b13d88d5943d3e7d5c957d2930bfc71",
+  "output_log": "practice\\chapter3\\results\\3-2-data-quality.log"
+}

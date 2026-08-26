@@ -1,0 +1,14 @@
+{
+  "file": "9-1-image-is-numbers.py",
+  "chapter_relpath": "practice\\chapter9\\code\\9-1-image-is-numbers.py",
+  "started_at": "2026-08-24T20:23:40.682886+09:00",
+  "duration_sec": 2.92,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "b64b7d0721e6188ca7d42181c15184407bdae8b183966f1e938207954158a3e7",
+  "output_sha256": "d10421288972a2117b9f263c632172bb577dfcfb06fb7877a30406ca32cb6aaf",
+  "output_log": "practice\\chapter9\\results\\9-1-image-is-numbers.log"
+}

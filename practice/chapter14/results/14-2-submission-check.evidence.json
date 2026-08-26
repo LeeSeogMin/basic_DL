@@ -1,0 +1,14 @@
+{
+  "file": "14-2-submission-check.py",
+  "chapter_relpath": "practice\\chapter14\\code\\14-2-submission-check.py",
+  "started_at": "2026-08-24T20:50:02.058764+09:00",
+  "duration_sec": 1.74,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "2117ae6fea5ad646611578dbd108d1e2c5eb826f689aff8ea656b72033bfc1ef",
+  "output_sha256": "3eea5c4ef96ff7f8880e15a92ce06607b5f91e7cff46e4938d9f5a6e80089248",
+  "output_log": "practice\\chapter14\\results\\14-2-submission-check.log"
+}

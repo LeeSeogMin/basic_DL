@@ -1,0 +1,14 @@
+{
+  "file": "5-0-concept-figures.py",
+  "chapter_relpath": "practice\\chapter5\\code\\5-0-concept-figures.py",
+  "started_at": "2026-08-24T20:41:49.919704+09:00",
+  "duration_sec": 2.28,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "96a0e7ceb2f32b98e1b0acd5f5cb68dc2fce40e97f91db13b385dfd7a1cc2d0e",
+  "output_sha256": "edf0eb62c98ed87f7b5a33dd28f61a83e98a27ed11d77b5dc82a32df06c98c22",
+  "output_log": "practice\\chapter5\\results\\5-0-concept-figures.log"
+}

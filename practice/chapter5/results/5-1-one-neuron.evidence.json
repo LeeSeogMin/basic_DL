@@ -1,0 +1,14 @@
+{
+  "file": "5-1-one-neuron.py",
+  "chapter_relpath": "practice\\chapter5\\code\\5-1-one-neuron.py",
+  "started_at": "2026-08-24T20:41:52.310452+09:00",
+  "duration_sec": 1.96,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "3f8967e69d8c39f1ab066a36f3f3fa70f81140fdf15cd0418e45395ae64ad330",
+  "output_sha256": "9e8c32135c3b6c23bdd518074da418dc7a47b7a9deca91fc7bfd3db8e0c4ff7b",
+  "output_log": "practice\\chapter5\\results\\5-1-one-neuron.log"
+}

@@ -1,0 +1,14 @@
+{
+  "file": "11-2-hallucination.py",
+  "chapter_relpath": "practice\\chapter11\\code\\11-2-hallucination.py",
+  "started_at": "2026-08-24T20:43:03.455106+09:00",
+  "duration_sec": 1.22,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "fca1fabf14776664d993d032ea7f3fd59cbccb586c3d6b51ac0c87f53bffd64f",
+  "output_sha256": "367144db7e0ad16af53c2d30e0c469fdb0becaeb6edc48c3406b90357d07fecf",
+  "output_log": "practice\\chapter11\\results\\11-2-hallucination.log"
+}

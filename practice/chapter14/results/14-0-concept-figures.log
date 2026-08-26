@@ -1,0 +1,12 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 14-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 14장 개념 그림 생성 ===
+저장: results/fig14-1-project-skeleton.png  (프로젝트의 뼈대 다섯 칸)
+저장: results/fig14-2-good-vs-avoid.png  (인정되는 프로젝트와 피해야 할 결과물)
+저장: results/fig14-3-submission-check.png  (제출 전 점검 여섯 가지)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

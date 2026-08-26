@@ -1,0 +1,52 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 2-2-read-error.py
+
+=== STDOUT ===
+=== 오류 메시지 읽기 연습 ===
+오류를 네 번 일부러 낸다. 오류를 감추려고 잡는 것이 아니라,
+파이썬이 준 메시지를 그대로 꺼내 읽으려고 잡는다.
+
+--- 1. NameError ---
+파이썬이 준 메시지: name 'message' is not defined
+어디서 났는가: 2-2-read-error.py 52번째 줄, cause_name_error() 안
+무슨 뜻인가: 그런 이름의 변수가 없다
+어디를 고치는가: 만들 때 쓴 이름과 부를 때 쓴 이름이 같은지 본다
+
+[참고] 오류를 잡지 않았다면 화면에 이렇게 나온다.
+      (폴더 경로는 파일 이름만 남기고 줄였다)
+    Traceback (most recent call last):
+      File "2-2-read-error.py", line 131, in run_one_case
+        case["trigger"]()
+      File "2-2-read-error.py", line 52, in cause_name_error
+        return message                 # 부를 때는 message -> 그런 이름이 없다
+               ^^^^^^^
+    NameError: name 'message' is not defined. Did you mean: 'mesage'?
+
+--- 2. TypeError ---
+파이썬이 준 메시지: can only concatenate str (not "int") to str
+어디서 났는가: 2-2-read-error.py 58번째 줄, cause_type_error() 안
+무슨 뜻인가: 종류가 다른 값을 섞어 썼다
+어디를 고치는가: 숫자를 str()로 바꾸거나 f-문자열을 쓴다
+
+--- 3. IndexError ---
+파이썬이 준 메시지: list index out of range
+어디서 났는가: 2-2-read-error.py 64번째 줄, cause_index_error() 안
+무슨 뜻인가: 리스트에 없는 자리를 꺼냈다
+어디를 고치는가: len()으로 길이를 세고 자리 번호가 0부터인 것을 확인한다
+
+--- 4. ZeroDivisionError ---
+파이썬이 준 메시지: division by zero
+어디서 났는가: 2-2-read-error.py 71번째 줄, cause_zero_division_error() 안
+무슨 뜻인가: 0으로 나눴다
+어디를 고치는가: 나누기 전에 나누는 값이 0인지 먼저 확인한다
+
+=== 읽는 순서 ===
+1. 맨 아랫줄을 읽는다. 오류 이름과 무엇이 잘못됐는지가 거기 있다.
+2. 그 위에서 파일 이름과 줄 번호를 찾는다. 그 줄을 연다.
+3. 맨 윗줄(Traceback ...)은 호출 기록이다. 마지막에 본다.
+
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+저장: results/error_guide_table.png  (LMS 제출물 2)
+
+오류 4건을 모두 잡아 읽었다. 프로그램은 끝까지 실행됐다.
+
+=== STDERR ===

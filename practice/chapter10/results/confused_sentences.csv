@@ -1,6 +1,0 @@
-sentence,true_label,predicted_label,positive_prob,reason
-I will definitely come back again soon,1,0,0.398,wrong
-I expected more but it was still decent,1,0,0.363,wrong
-Nothing good about this place at all,0,1,0.552,wrong
-The view was breathtaking and beautiful,1,0,0.414,wrong
-A total disaster from beginning to end,0,0,0.498,uncertain

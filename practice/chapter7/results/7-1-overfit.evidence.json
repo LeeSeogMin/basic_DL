@@ -1,0 +1,14 @@
+{
+  "file": "7-1-overfit.py",
+  "chapter_relpath": "practice\\chapter7\\code\\7-1-overfit.py",
+  "started_at": "2026-08-24T20:42:22.088338+09:00",
+  "duration_sec": 3.09,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "cb6630477a4cf95029e929cc6c6df91f2383771b8857b4d4a983129bb69a0954",
+  "output_sha256": "23df4a8c7bea322535c9d4b243740c8411103fbb102bb84efcc0ad87673bd5d5",
+  "output_log": "practice\\chapter7\\results\\7-1-overfit.log"
+}

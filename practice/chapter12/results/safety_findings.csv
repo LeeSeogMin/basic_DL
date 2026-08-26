@@ -1,0 +1,13 @@
+﻿파일,줄,위험도,신호,코드
+_sample_safe.py,42,낮음,파일 쓰기,"summary.to_csv(OUTPUT_CSV, index=False, enc…"
+_sample_risky.py,49,높음,파일 삭제,os.remove(leftover)
+_sample_risky.py,50,높음,파일 삭제,shutil.rmtree(WORK_DIR)
+_sample_risky.py,59,높음,외부 전송,"requests.post(UPLOAD_URL, json=payload, hea…"
+_sample_risky.py,60,높음,외부 전송,"urllib.request.urlopen(UPLOAD_URL + ""?ping=…"
+_sample_risky.py,69,높음,셸 명령 실행,"os.system(""tar -czf backup.tar.gz "" + folde…"
+_sample_risky.py,70,높음,셸 명령 실행,"subprocess.run(""echo "" + folder_name, shell…"
+_sample_risky.py,79,높음,멈추지 않는 반복,while True:  (멈추는 문장 없음)
+_sample_risky.py,35,중간,하드코딩된 비밀키,"API_KEY = ""***"""
+_sample_risky.py,36,중간,하드코딩된 비밀키,"DB_PASSWORD = ""***"""
+12-1-spec-to-tool.py,184,낮음,파일 쓰기,"fig.savefig(out_path, dpi=160)"
+12-1-spec-to-tool.py,289,낮음,파일 쓰기,"table.to_csv(csv_path, index=False, encodin…"

@@ -1,34 +1,38 @@
-$ /Users/callii/Documents/class/2026-2/basic_DL/.venv/bin/python 4-1-simple-classifier.py
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 4-1-simple-classifier.py
 
 === STDOUT ===
-=== 4주차 머신러닝 첫걸음 ===
-전체 데이터 수: 160
-훈련 데이터 수: 112
-테스트 데이터 수: 48
+=== 실습 4.1 내가 그은 선 vs 모델이 찾은 선 ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+데이터: 컴퓨터로 만든 합성 데이터(실제 학생 자료 아님)
+전체 160명 = 훈련 112명 + 테스트 48명
+전체에서 통과한 학생: 79명, 미통과: 81명
 
-=== 기준선 모델 ===
-전략: 테스트 데이터의 모든 점을 훈련 데이터에서 더 많은 그룹으로 예측
-기준선 정확도: 0.521
+=== 내가 그은 선 ===
+식: 수면시간 = -1.0 x 공부시간 + 11.0
+훈련 데이터 정확도: 0.902
+테스트 데이터 정확도: 0.896
 
-=== 로지스틱 회귀 분류기 ===
-테스트 정확도: 0.917
-혼동행렬:
-[[24  1]
- [ 3 20]]
+=== 모델이 찾은 선 ===
+식: 수면시간 = -1.59 x 공부시간 + 13.96
+훈련 데이터 정확도: 0.893
+테스트 데이터 정확도: 0.938
 
-=== 틀린 사례 일부 ===
- rank  feature_1  feature_2  true_label  predicted_label
-    1     -1.933     -1.546           1                0
-    2     -2.340     -0.576           1                0
-    3      0.495      1.592           0                1
-    4     -0.890     -2.246           1                0
+=== 테스트 데이터에서 세 가지 비교 ===
+방법                         테스트 정확도
+기준선(무조건 한쪽)                  0.500
+내가 그은 선                      0.896
+모델이 찾은 선                     0.938
+
+=== 모델이 틀린 사례 ===
+ 순위  공부시간  수면시간  실제 모델예측
+  1  4.71  5.93  통과  미통과
+  2  4.06  7.78 미통과   통과
+  3  5.69  3.74  통과  미통과
 
 === 저장된 결과 ===
-판단 경계 그림: results/decision_boundary.png
-혼동행렬 그림: results/confusion_matrix.png
-틀린 사례 CSV: results/misclassified_examples.csv
+비교 그림: results/decision_boundary.png
+틀린 사례: results/misclassified_examples.csv
 
-=== 해석 주의 ===
-정확도는 맞힌 비율이다. 어떤 방향으로 틀렸는지는 혼동행렬과 틀린 사례를 함께 봐야 한다.
+MY_SLOPE와 MY_INTERCEPT를 바꿔 다시 실행하면 내 선의 정확도가 달라진다.
 
 === STDERR ===

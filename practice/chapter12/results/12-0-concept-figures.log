@@ -1,0 +1,12 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 12-0-concept-figures.py
+
+=== STDOUT ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+=== 12장 개념 그림 생성 ===
+저장: results/fig12-1-autocomplete-vs-agent.png  (자동완성과 코딩 에이전트가 맡는 범위)
+저장: results/fig12-2-task-breakdown.png  (큰 요구를 작업 단위로 쪼개기)
+저장: results/fig12-3-responsibility-line.png  (맡긴 일과 책임지는 일의 경계)
+
+이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.
+
+=== STDERR ===

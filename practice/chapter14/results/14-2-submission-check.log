@@ -1,0 +1,49 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 14-2-submission-check.py
+
+=== STDOUT ===
+=== 실습 14.2 제출 전 자동 점검 ===
+[그림 폰트] 한글 폰트 사용: ['Malgun Gothic']
+이 도구는 파일을 읽기만 한다. 고치거나 지우지 않는다.
+점검 대상 1: practice/chapter14/example_project
+점검 대상 2: practice/chapter14/example_project_rough
+
+--- 예시 프로젝트: example_project ---
+번호  결과    점검 항목
+1    통과    실행되는 파이썬 파일이 있는가
+           근거: .py 1개 모두 문법 오류 없음
+2    통과    결과 파일이 있는가
+           근거: 결과 파일 2개 - results/run.log, results/scores.csv
+3    통과    데이터 또는 입력 예시가 있는가
+           근거: 입력 파일 1개 - data/input_example.csv
+4    통과    코드에 비밀키가 적혀 있지 않은가
+           근거: 키처럼 보이는 문자열을 찾지 못했다
+5    통과    데이터에 실명·연락처·학번이 없는가
+           근거: 개인정보처럼 보이는 문자열을 찾지 못했다
+6    통과    사용 방법을 적은 파일이 있는가
+           근거: README.md
+=> 6/6 통과
+
+--- 비교용 폴더: example_project_rough ---
+번호  결과    점검 항목
+1    미통과   실행되는 파이썬 파일이 있는가
+           근거: .py 2개 중 문법 오류 1개 - half_written.py:8
+2    미통과   결과 파일이 있는가
+           근거: 그림·로그도 없고 results 폴더도 없다
+3    통과    데이터 또는 입력 예시가 있는가
+           근거: 입력 파일 1개 - participants.csv
+4    미통과   코드에 비밀키가 적혀 있지 않은가
+           근거: 2곳 - app.py:5 코드에 값이 그대로 적힌 키·비밀번호 / app.py:6 코드에 값이 그대로 적힌 키·비밀번호
+5    미통과   데이터에 실명·연락처·학번이 없는가
+           근거: 4곳 - participants.csv:1 이름·학번을 담는 열 이름 / participants.csv:2 휴대폰 번호 형태
+6    미통과   사용 방법을 적은 파일이 있는가
+           근거: README 또는 사용법 파일이 없다
+=> 1/6 통과
+
+=== 저장된 결과 ===
+점검표 그림: results/submission_check.png
+점검 결과 표: results/submission_check_table.csv
+
+자기 프로젝트를 점검하려면 PROJECT_DIR 에 그 폴더 경로를 적는다.
+4번과 5번이 미통과면 파일을 올리기 전에 반드시 고친다.
+
+=== STDERR ===

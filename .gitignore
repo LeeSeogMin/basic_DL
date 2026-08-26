@@ -9,11 +9,10 @@ __pycache__/
 node_modules/
 dist/
 build/
-scripts/
+.claude/
 
-
-# 이번 세션 강의자료 사본 (참조용, 추적하지 않음)
-docs_ex/
-practice_ex/
-schema_ex/
+checklists/
+contents.md
 harness.md
+
+
