@@ -10,9 +10,13 @@ node_modules/
 dist/
 build/
 .claude/
+scripts/
+schema/
 
 checklists/
 contents.md
 harness.md
+tmp/
+
 
 
