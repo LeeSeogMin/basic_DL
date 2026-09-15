@@ -15,14 +15,23 @@ LaTeX를 설치하지 않아도 되고, 그림과 표가 화면에서 보이던 
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
+sys.path.insert(0, str(SCRIPTS_DIR))
+
+# 해시 함수를 실행 증거 게이트와 똑같은 것으로 쓴다.
+# course_gates.py의 G3가 여기서 남긴 해시를 그대로 비교한다.
+from run_and_capture import sha256_of_text  # noqa: E402
 
 CHROME_CANDIDATES = [
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -222,9 +231,16 @@ def md_to_html(md_path: Path, html_path: Path, css_path: Path) -> None:
     subprocess.run(cmd, check=True)
 
 
-def html_to_pdf(html_path: Path, pdf_path: Path) -> None:
-    """Chrome headless로 HTML을 PDF로 인쇄한다."""
+def html_to_pdf(html_path: Path, pdf_path: Path, timeout: int = 300) -> str:
+    """Chrome headless로 HTML을 PDF로 인쇄한다.
+
+    Chrome 153의 `--headless=new`는 인쇄를 끝낸 뒤에도 프로세스가 남는 경우가 있다.
+    그래서 프로세스가 끝나기를 기다리지 않는다. PDF 파일이 생기고 크기가 더 늘지
+    않으면 인쇄가 끝난 것으로 보고, 남아 있는 Chrome을 직접 내린다.
+    """
     chrome = find_chrome()
+    pdf_path.unlink(missing_ok=True)
+
     with tempfile.TemporaryDirectory() as profile_dir:
         cmd = [
             chrome,
@@ -238,11 +254,78 @@ def html_to_pdf(html_path: Path, pdf_path: Path) -> None:
             f"--print-to-pdf={pdf_path}",
             html_path.resolve().as_uri(),
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    if not pdf_path.exists():
-        sys.stderr.write(result.stdout + "\n" + result.stderr + "\n")
+        deadline = time.monotonic() + timeout
+        last_size = -1
+        while time.monotonic() < deadline:
+            if proc.poll() is not None:
+                break
+            if pdf_path.exists():
+                size = pdf_path.stat().st_size
+                if size > 0 and size == last_size:
+                    break
+                last_size = size
+            time.sleep(1.0)
+
+        if proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait(timeout=10)
+
+        stdout, stderr = "", ""
+        try:
+            stdout, stderr = proc.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+
+    if not pdf_path.exists() or pdf_path.stat().st_size == 0:
+        sys.stderr.write((stdout or "") + "\n" + (stderr or "") + "\n")
         raise RuntimeError(f"PDF가 만들어지지 않았습니다: {pdf_path}")
+
+    return chrome
+
+
+def write_pdf_evidence(md_path: Path, pdf_path: Path, chrome: str) -> Path:
+    """PDF를 만든 시점의 본문 해시를 남긴다.
+
+    git은 파일 수정 시각을 보존하지 않아서, 클론한 저장소에서는 시각 비교로
+    "본문을 고친 뒤 PDF를 안 만들었다"를 판정할 수 없다. 해시를 남겨야 판정된다.
+    실행 증거(run_and_capture.py)와 같은 형식을 쓴다.
+    """
+    pandoc_version = ""
+    pandoc_path = shutil.which("pandoc")
+    if pandoc_path:
+        result = subprocess.run(
+            [pandoc_path, "--version"], capture_output=True, text=True
+        )
+        pandoc_version = result.stdout.splitlines()[0].strip() if result.stdout else ""
+
+    def relpath(path: Path) -> str:
+        try:
+            return str(path.relative_to(PROJECT_ROOT))
+        except ValueError:
+            return str(path)
+
+    evidence = {
+        "source_markdown": relpath(md_path),
+        "source_sha256": sha256_of_text(md_path.read_text(encoding="utf-8")),
+        "output_pdf": relpath(pdf_path),
+        "output_bytes": pdf_path.stat().st_size,
+        "generated_at": datetime.now(timezone.utc).astimezone().isoformat(),
+        "pandoc": pandoc_version,
+        "browser": chrome,
+    }
+
+    evidence_path = pdf_path.with_name(pdf_path.name + ".evidence.json")
+    evidence_path.write_text(
+        json.dumps(evidence, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return evidence_path
 
 
 def main() -> int:
@@ -269,7 +352,8 @@ def main() -> int:
     md_to_html(md_path, html_path, css_path)
 
     print(f"[3/3] HTML -> PDF: {pdf_path.name}")
-    html_to_pdf(html_path, pdf_path)
+    chrome = html_to_pdf(html_path, pdf_path)
+    evidence_path = write_pdf_evidence(md_path, pdf_path, chrome)
 
     if not args.keep_html:
         html_path.unlink(missing_ok=True)
@@ -277,6 +361,7 @@ def main() -> int:
 
     size_kb = pdf_path.stat().st_size / 1024
     print(f"완료: {pdf_path} ({size_kb:,.0f} KB)")
+    print(f"생성 기록: {evidence_path.name}")
     return 0
 
 

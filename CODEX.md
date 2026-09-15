@@ -29,12 +29,8 @@ basic_DL/
 ├── CLAUDE.md
 ├── harness.md
 ├── docs/
-│   ├── curri.md
-│   └── ch{N}.md
-├── lecture/
-│   ├── chapter{N}.md
-│   ├── assets/
-│   └── slides/
+│   ├── ch{N}.md
+│   └── ch{N}.pdf
 ├── schema/
 │   └── chap{N}.md
 ├── content/
@@ -50,6 +46,8 @@ basic_DL/
 │       └── results/
 └── scripts/
     ├── run_and_capture.py
+    ├── course_gates.py
+    ├── md2pdf.py
     ├── harness.sh
     └── verify.sh
 ```
@@ -85,7 +83,7 @@ basic_DL/
 | 실습 | 실행 가능한 코드 | `practice/chapter{N}/code/` |
 | 실행 증거 | 로그, evidence JSON | `practice/chapter{N}/results/` |
 | 원고 | 강의자료 본문 | `docs/ch{N}.md` |
-| 파생 | 수업 활동, 슬라이드 초안 | `lecture/` |
+| 배포 | 학생 배포용 PDF | `docs/ch{N}.pdf` |
 
 ## 완료 기준
 

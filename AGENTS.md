@@ -16,9 +16,11 @@
 | `schema/chap{N}.md` | 장별 절 구성, 실습 설계, 외부 자료, 제출물 | 작업자 |
 | `docs/ch{N}.md` | 교재 본문 | 학생 |
 | `practice/chapter{N}/` | 실행 가능한 실습 코드와 실행 증거 | 학생·작업자 |
-| `lecture/` | 수업 운영 메모, 발표 안내 등 교재 밖 자료 | 교수자 |
+| `coding-agent-setting.md` | 코딩 에이전트 설치와 규칙 파일 설정 | 학생 |
+| `agent-harness-guide.md` | gotchas·lessons-learned·하네스의 뜻과 설정법 | 학생 |
 
 - `docs/curri.md`를 두지 않는다. 그 내용은 `강의계획서.md`와 `contents.md`로 나뉜다.
+- `lecture/` 디렉터리를 두지 않는다. 교재 본문은 `docs/ch{N}.md` 하나로 모았다.
 - 8주차와 15주차는 교재 장이 아니다. 8주차 안내는 `docs/ch8.md`, 계획은 `schema/chap8.md`에 둔다.
 
 ## 2. 절대 규칙
@@ -40,12 +42,12 @@
 
 장 작성 또는 큰 개정은 아래 순서로 진행한다.
 
-1. `docs/curri.md`와 해당 `docs/ch{N}.md`를 확인한다.
+1. `강의계획서.md`의 해당 주차와 `docs/ch{N}.md`를 확인한다.
 2. `schema/chap{N}.md`에 장 목표, 절 구성, 실습 계획을 정리한다.
 3. 필요한 경우 `content/research/`에 최신 자료와 참고문헌을 정리한다.
 4. 실습 코드는 `practice/chapter{N}/code/`에 둔다.
 5. `scripts/run_and_capture.py`로 실행 증거를 만든다.
-6. 결과를 근거로 `docs/ch{N}.md` 또는 `lecture/chapter{N}.md`를 수정한다.
+6. 결과를 근거로 `docs/ch{N}.md`를 수정한다. 본문을 고쳤으면 `python3 scripts/md2pdf.py docs/ch{N}.md`로 PDF를 다시 만든다.
 7. `./scripts/harness.sh`로 최소 검증을 수행한다.
 
 ## 5. 강의자료 작성 기준
@@ -60,7 +62,6 @@
   - `### 핵심 정리` — 개념 한 줄 정리 표
 - 8주차와 15주차는 교재 장이 아니다. 8주차 안내는 `docs/ch8.md`에 둔다.
 - 본문에는 핵심 코드만 짧게 넣고 전체 코드는 `practice/`에 둔다.
-- 수업 운영 메모와 교재형 설명이 섞이면 `lecture/`와 `docs/`로 역할을 분리한다.
 
 ## 6. 딥러닝 실습 기준
 
@@ -72,4 +73,16 @@
 
 ## 7. 작업 메모리
 
-작업 시작 시 필요한 경우 `.ai/context.md`, `.ai/todo.md`, `.ai/gotchas.md`를 확인한다. 작업 중 새로 발견한 반복 함정은 `.ai/gotchas.md` 또는 `.claude/lessons-learned.md`에 남긴다.
+작업 메모리는 `.ai/` 한 곳에 둔다.
+
+| 파일 | 무엇을 담나 |
+|---|---|
+| `.ai/context.md` | 현재 상태와 주요 결정 |
+| `.ai/todo.md` | 남은 작업과 완료 항목 |
+| `.ai/gotchas.md` | 반복해서 밟는 함정 |
+| `.ai/lessons-learned.md` | 한 번 푼 문제의 경위 (상황·해결책·규칙) |
+
+- **국소 수정을 넘는 작업이면 시작 전에 위 네 파일을 읽는다.** 파일 한 곳을 고치는 정도의 작업이면 건너뛴다.
+- 새로 발견한 반복 함정은 `.ai/gotchas.md`에, 한 번 푼 문제의 경위는 `.ai/lessons-learned.md`에 남긴다.
+- **메모리는 실제로 새 상태가 생겼을 때만 갱신한다.** 작업마다 기계적으로 고치지 않는다.
+- 자기 보고를 완료 근거로 쓰지 않는다. 파일, 명령, 로그, 만들어진 산출물을 근거로 쓴다.

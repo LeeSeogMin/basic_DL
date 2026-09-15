@@ -126,7 +126,7 @@ def write_results(chapter_dir: Path, py_file: Path, evidence: dict, combined: st
     )
 
 
-def verify(chapter_dir: Path, files: list[Path]) -> int:
+def verify(chapter_dir: Path, files: list[Path], quiet: bool = False) -> int:
     results_dir = chapter_dir / "results"
     problems = 0
 
@@ -146,7 +146,7 @@ def verify(chapter_dir: Path, files: list[Path]) -> int:
         elif not evidence.get("success"):
             print(f"[failed] 실패한 실행: {py_file.name} - exit_code={evidence.get('exit_code')}")
             problems += 1
-        else:
+        elif not quiet:
             print(f"[ok] 유효: {py_file.name}")
 
     return problems

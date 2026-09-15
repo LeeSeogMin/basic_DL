@@ -1,0 +1,9 @@
+{
+  "source_markdown": "agent-harness-guide.md",
+  "source_sha256": "7b864787dd25391112b22106ee901a3c579cd77d3e15e25ec4249a10d5295ac9",
+  "output_pdf": "agent-harness-guide.pdf",
+  "output_bytes": 684803,
+  "generated_at": "2026-09-16T08:41:52.824763+09:00",
+  "pandoc": "pandoc 3.9.0.2",
+  "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+}

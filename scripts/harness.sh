@@ -11,10 +11,14 @@ fail() {
   exit 1
 }
 
+# 실제로 수행한 검사 건수. 0이면 통과로 보지 않는다.
+CHECKS=0
+
 run_step() {
   local name="$1"; shift
   echo "--- $name: $*"
   "$@" || fail "$name failed"
+  CHECKS=$((CHECKS + 1))
 }
 
 echo "=== Harness started ($(date '+%Y-%m-%d %H:%M:%S')) ==="
@@ -75,6 +79,12 @@ if [ -f pyproject.toml ] || [ -f requirements.txt ] || [ -f practice/requirement
   fi
 fi
 
+if [ -f scripts/course_gates.py ]; then
+  DETECTED=1
+  echo "[detect] 강의자료 저장소 - 학기 운영 게이트"
+  run_step "course gates" python3 scripts/course_gates.py
+fi
+
 if [ -f Makefile ] && grep -qE '^verify:' Makefile; then
   DETECTED=1
   echo "[detect] Makefile verify target"
@@ -86,5 +96,13 @@ if [ "$DETECTED" -eq 0 ]; then
   echo "[info] package.json / pyproject.toml / requirements.txt / Makefile 이 생기면 자동 검증이 활성화된다."
 fi
 
+# 검사를 하나도 하지 않은 실행은 통과가 아니다.
+# lint도 test도 건너뛴 채 HARNESS_PASS를 찍으면 완료 판정이 무조건 통과한다.
+if [ "$CHECKS" -eq 0 ]; then
+  echo "HARNESS_FAIL: 검사를 하나도 수행하지 못했다. 통과로 볼 근거가 없다."
+  exit 1
+fi
+
+echo "=== 수행한 검사 ${CHECKS}건 ==="
 echo "HARNESS_PASS"
 
