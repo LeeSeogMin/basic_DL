@@ -1,0 +1,14 @@
+{
+  "file": "3-3-summarize-table.py",
+  "chapter_relpath": "practice\\chapter3\\code\\3-3-summarize-table.py",
+  "started_at": "2026-09-20T19:58:45.820052+09:00",
+  "duration_sec": 7.7,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "216844caac39d902566fae0aba41dc0246e17be102e847164801b617b74a26f4",
+  "output_sha256": "178bcc27c61390b41c5fb4b2687b270cb29c8ae77ff8c0425a7e1a4f023d6d89",
+  "output_log": "practice\\chapter3\\results\\3-3-summarize-table.log"
+}

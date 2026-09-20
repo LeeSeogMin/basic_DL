@@ -1,0 +1,25 @@
+$ C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe 3-2-make-messy-data.py
+
+=== STDOUT ===
+=== 실습 3.2 준비. 흠집 난 표 만들기 ===
+데이터: 컴퓨터로 만든 합성 데이터(실제 설문 응답 아님)
+원본 60행에 낸 흠집:
+  중복 행 4건 / 문자열 점수 6건 / 수면시간 이상치 3건 / 공부시간 결측 10건 / 시험점수 결측 3건
+저장: results/week03-dirty.csv
+저장한 표: 64행 x 5열
+
+표 앞부분 8행
+ 응답번호        별명  공부시간  수면시간 시험점수
+    1 student01   NaN   5.0   69
+    2 student02   2.4   6.6  67점
+    3 student03   5.1   7.2   84
+    4 student04   5.4   7.7   94
+    5 student05   1.1   7.9   65
+    6 student06   NaN   8.0   68
+    7 student07   4.2   6.6   85
+    8 student08   NaN   6.4   65
+
+어느 행, 어느 칸에 흠집이 있는지는 여기에 적지 않는다.
+찾는 일부터가 실습이다. 교재의 검증 체크리스트와 대조하며 진행한다.
+
+=== STDERR ===

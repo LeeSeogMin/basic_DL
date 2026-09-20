@@ -1,0 +1,14 @@
+{
+  "file": "3-2-make-messy-data.py",
+  "chapter_relpath": "practice\\chapter3\\code\\3-2-make-messy-data.py",
+  "started_at": "2026-09-20T19:03:49.565995+09:00",
+  "duration_sec": 3.11,
+  "exit_code": 0,
+  "timed_out": false,
+  "success": true,
+  "python_version": "3.12.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_sha256": "3543e245035bada26f0220aedd964534102a0e3979fccaa626839c5620c42131",
+  "output_sha256": "a7f25bd9724ee2dce25670f40bc53c04a12c67df3c262105a476de479f52caef",
+  "output_log": "practice\\chapter3\\results\\3-2-make-messy-data.log"
+}
