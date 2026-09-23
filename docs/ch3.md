@@ -736,3 +736,15 @@ _출처: `practice/chapter3/results/3-3-summarize-table.log`_
 [^google-numeric]: Google, "숫자 데이터: 데이터 살펴보기 첫 단계", 머신러닝 단기집중과정. https://developers.google.com/machine-learning/crash-course/numerical-data/first-steps?hl=ko (2026년 8월 24일 확인)
 
 [^sklearn-impute]: scikit-learn developers, "Imputing missing values before building an estimator". https://scikit-learn.org/stable/auto_examples/impute/plot_missing_values.html (2026년 8월 24일 확인)
+
+
+#### 과제: 실습을 수행하고 산출된 아래의 파일을 압축하지말고 제출한다. 
+
+week03-my-data.csv
+my-interests.png- 관심사 표의 점수와 막대그래프가 일치하는지 확인
+- 한글 폰트 문제 확인
+
+week03-cleaned.csv
+data-cleaning-before-after.png- 정제 전후의 분포와 문제 건수 비교
+
+week03-quality-report.csv- 찾음·고침·남음 수치 확인
