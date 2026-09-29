@@ -1,9 +1,10 @@
 """4장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 세 장이다.
+만드는 그림은 두 장이다.
   fig4-1  규칙 기반 방식과 머신러닝 방식의 흐름 비교
   fig4-2  훈련 데이터와 테스트 데이터를 나누는 이유
-  fig4-3  혼동행렬 칸 이름표
+
+정밀도·재현율의 우선순위는 그림이 아니라 본문 표 4.6·4.7로 설명한다.
 
 이 그림들은 데이터 분석 결과가 아니라 개념 설명용 도식이다.
 """
@@ -171,52 +172,6 @@ def figure_train_test(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
-def figure_confusion_guide(ko: bool, out_path: Path) -> None:
-    """그림 4-3: 혼동행렬의 네 칸이 각각 무엇인지."""
-    L = _krfont.label
-    fig, ax = plt.subplots(figsize=(8.2, 5.6))
-    blank_axes(ax, xlim=(0, 10), ylim=(0, 8))
-
-    ax.set_title(
-        L("혼동행렬 — 어느 방향으로 틀렸는지 보여주는 표",
-          "Confusion matrix - which way the model was wrong", ko),
-        fontsize=13, pad=12, loc="left",
-    )
-
-    # 칸 순서는 실습 4.2가 출력하는 혼동행렬과 똑같이 맞춘다.
-    # 가로: 예측 정상 -> 예측 스팸, 세로: 정답 정상 -> 정답 스팸
-    cells = [
-        (2.2, 4.2, GREEN,
-         L("정답: 정상\n예측: 정상\n→ 잘 넘겼다", "true: normal\npred: normal\n-> correct", ko)),
-        (5.9, 4.2, RED,
-         L("정답: 정상\n예측: 스팸\n→ 헛짚었다", "true: normal\npred: spam\n-> false alarm", ko)),
-        (2.2, 1.0, RED,
-         L("정답: 스팸\n예측: 정상\n→ 놓쳤다", "true: spam\npred: normal\n-> missed", ko)),
-        (5.9, 1.0, GREEN,
-         L("정답: 스팸\n예측: 스팸\n→ 잘 잡았다", "true: spam\npred: spam\n-> caught", ko)),
-    ]
-    for x, y, color, text in cells:
-        box(ax, x, y, 3.4, 2.8, text, color, 11)
-
-    ax.text(3.9, 7.35, L("예측: 정상", "predicted: normal", ko),
-            ha="center", fontsize=11.5, color="#333333")
-    ax.text(7.6, 7.35, L("예측: 스팸", "predicted: spam", ko),
-            ha="center", fontsize=11.5, color="#333333")
-    ax.text(1.9, 5.6, L("정답:\n정상", "true:\nnormal", ko),
-            ha="right", va="center", fontsize=11.5, color="#333333")
-    ax.text(1.9, 2.4, L("정답:\n스팸", "true:\nspam", ko),
-            ha="right", va="center", fontsize=11.5, color="#333333")
-
-    ax.text(5.0, 0.25,
-            L("초록 칸은 맞힌 것, 빨간 칸은 틀린 것이다. 두 빨간 칸의 무게는 같지 않다.",
-              "Green cells are correct, red cells are wrong - and the two reds do not weigh the same.", ko),
-            ha="center", fontsize=10.5, color="#333333")
-
-    fig.tight_layout()
-    fig.savefig(out_path, dpi=160)
-    plt.close(fig)
-
-
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -229,8 +184,6 @@ def main() -> None:
          "규칙 기반 방식과 머신러닝 방식 비교"),
         ("fig4-2-train-test-split.png", figure_train_test,
          "훈련 데이터와 테스트 데이터 분할"),
-        ("fig4-3-confusion-guide.png", figure_confusion_guide,
-         "혼동행렬 칸 이름표"),
     ]
 
     for filename, builder, description in targets:

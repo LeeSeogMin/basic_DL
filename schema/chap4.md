@@ -26,21 +26,22 @@
 | 3 | 훈련 데이터와 테스트 데이터 | 연습 문제와 시험 문제, stratify | 그림 4.2 분할 도식 |
 | 4 | 기준선 | 비교 상대 없는 정확도는 해석 불가 | — |
 | 5 | 정확도 하나만 보면 속는다 | 불균형 데이터, 스팸 5% 예시 | — |
-| 6 | 혼동행렬 | 놓침과 헛짚음, 두 오류의 무게 차이 | 그림 4.3 칸 이름표 |
+| 6 | 혼동행렬 | 놓침과 헛짚음, 두 오류의 무게 차이 | 표 4.3~4.5, 표 4.6 스팸(정밀도 우선), 표 4.7 암 검진(재현율 우선) |
 | 7 | 직접 움직여 보는 웹 자료 | 외부 시각 자료 4건 | 링크 표 |
 
 ## 4. 2차시 실습 설계
 
 실습은 두 개다. 각각 노트북에서 몇 초 안에 끝난다. GPU가 필요 없다.
 
-### 실습 4.1 — 내가 그은 선 vs 모델이 찾은 선
+### 실습 4.1 — 같은 데이터, 다른 방법 세 가지
 
 - 파일: `practice/chapter4/code/4-1-simple-classifier.py`
 - 데이터: 합성 학생 데이터 160명(공부 시간, 수면 시간 → 시험 통과 여부)
-- 학생 조작 지점: 파일 상단의 `MY_SLOPE`, `MY_INTERCEPT`
-- 비교 대상 셋: 기준선 / 내가 그은 선 / 로지스틱 회귀가 찾은 선
-- 성취 지점: 모델이 찾은 선을 기울기·절편 식으로 꺼내 보고, 자기 선과 겨룬다
-- 산출물: `results/decision_boundary.png`, `results/misclassified_examples.csv`
+- 학생 조작 지점: 파일 상단의 `MY_TREE_DEPTH`
+- 비교 대상 셋: 기준선 / 로지스틱 회귀가 찾은 선 / 결정 트리가 찾은 규칙
+- 성취 지점: 로지스틱 회귀가 찾은 선을 기울기·절편 식으로, 결정 트리가 찾은 규칙을 조건문으로 꺼내 읽는다
+- 7장 예고: 트리 깊이를 풀면 훈련 1.000 / 테스트 0.917로 갈린다
+- 산출물: `results/tree_rules.png`, `results/decision_boundary.png`, `results/misclassified_examples.csv`
 
 ### 실습 4.2 — 정확도 95% 모델의 정체
 
@@ -48,12 +49,12 @@
 - 데이터: 합성 메일 1000통, 스팸 50통(5%)
 - 비교 대상 셋: 무조건 정상 / 기본 로지스틱 회귀 / `class_weight="balanced"`
 - 교훈 지점: 정확도가 가장 높은 모델이 스팸의 3분의 2를 놓친다
-- 산출물: `results/confusion_matrix.png`, `results/accuracy_trap_table.csv`
+- 산출물: `results/accuracy_trap_table.csv` (혼동행렬은 본문 표 4.9로 싣는다)
 
 ### 개념 그림 생성
 
 - 파일: `practice/chapter4/code/4-0-concept-figures.py`
-- 산출물: `results/fig4-1-rule-vs-learning.png`, `results/fig4-2-train-test-split.png`, `results/fig4-3-confusion-guide.png`
+- 산출물: `results/fig4-1-rule-vs-learning.png`, `results/fig4-2-train-test-split.png`
 - 한글 폰트 도우미: `practice/chapter4/code/_krfont.py` (폰트가 없으면 영어 라벨로 자동 전환)
 
 ## 5. 실행 증거
@@ -76,13 +77,14 @@ python scripts/run_and_capture.py 4 --verify
 
 ## 7. 제출물
 
-수업 중 실습 실시 여부만 확인한다. 보고서를 쓰지 않는다.
+두 실습의 `해 보기` 질문 여섯 개에 답한 글 하나. 보고서 형식을 갖추지 않는다.
 
-1. `results/decision_boundary.png`
-2. `results/confusion_matrix.png`
+- 실습 4.1 해 보기 1~3: `MY_TREE_DEPTH`를 `1`, `2`, `None`으로 바꾼 결과
+- 실습 4.2 해 보기 1~3: `N_SPAM`을 `10`, `500`으로 바꾼 결과
+- 인정 기준: 여섯 질문에 모두 답하고, 각 답에 자기가 실행해 얻은 수치가 하나 이상 들어 있을 것
 
 ## 8. 책임 있는 AI 체크
 
-`docs/ch4.md`의 `### 책임 있는 AI 체크` 절에 제출 전 점검 표를 둔다. 이 장에서 배운 것은 "정확도 한 숫자를 그대로 믿지 않는다"이다. 제출물에도 그대로 적용한다.
+이 장에는 두지 않는다. 과제를 해 보기 답안으로 바꾸면서 `docs/ch4.md`의 `### 책임 있는 AI 체크` 절과 AI 답변 검증표를 함께 뺐다.
 
-점검 항목: 기준선 비교, 정확도 과장, 오류 방향, 틀린 사례, 선택 근거, AI 답변 검증
+**주의**: `AGENTS.md` 5절은 모든 장에 이 절을 두라고 정한다. 4장만 예외이므로, 규격을 바꿀지 4장에 되살릴지 정해야 한다.
