@@ -1,11 +1,14 @@
 """5장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 세 장이다.
+만드는 그림은 네 장이다. 번호는 본문(docs/ch5.md)의 그림 번호를 따른다.
   fig5-1  뉴런 하나의 구조 (입력 -> 가중치 곱 -> 합 -> 편향 -> 활성화 -> 출력)
-  fig5-2  활성화 함수가 없으면 층을 쌓아도 직선 하나와 같다
-  fig5-3  층을 쌓으면 판단 영역이 어떻게 접히는가
+  fig5-3  XOR 네 점은 직선 하나로 나눌 수 없다
+  fig5-4  층을 쌓으면 판단 영역이 어떻게 접히는가
 
-fig5-2와 fig5-3은 손으로 그린 도식이 아니라, 아래에 적어 둔 가중치를
+(그림 5.2는 실습 5.1이 만드는 activation_functions.png 이고, 그림 5.5·5.6도
+실습 산출물이다. 그래서 이 스크립트의 번호는 1, 3, 4 로 건너뛴다.)
+
+fig5-3, fig5-4 는 손으로 그린 도식이 아니라, 아래에 적어 둔 가중치를
 실제로 계산해서 그린 그림이다. 쓰는 신경망은 다음과 같다.
 
   은닉 뉴런 1:  h1 = x1 + x2 - 0.5
@@ -46,6 +49,14 @@ OUT_W = (1.0, -3.0, -0.25)  # (h1 가중치, h2 가중치, 편향)
 # XOR 네 점: 두 입력이 다르면 1, 같으면 0
 XOR_POINTS = np.array([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]])
 XOR_LABELS = np.array([0, 1, 1, 0])
+
+# 4절에서 "직선 하나로는 안 된다"를 보일 때 대 보는 직선 후보들.
+# (a, b, c) 는 a*x1 + b*x2 + c > 0 인 쪽을 1로 판정한다는 뜻이다.
+LINE_CANDIDATES = [
+    ((1.0, 0.0, -0.5), "x1 = 0.5"),
+    ((0.0, 1.0, -0.5), "x2 = 0.5"),
+    ((1.0, 1.0, -0.5), "x1 + x2 = 0.5"),
+]
 
 
 def box(ax, x, y, w, h, text, facecolor, fontsize=11, textcolor="white"):
@@ -106,6 +117,27 @@ def network_output(gx, gy, use_relu: bool):
         h1 = np.maximum(h1, 0.0)
         h2 = np.maximum(h2, 0.0)
     return OUT_W[0] * h1 + OUT_W[1] * h2 + OUT_W[2]
+
+
+def line_score(coef) -> int:
+    """직선 하나가 XOR 네 점 중 몇 점을 맞히는지 센다."""
+    a, b, c = coef
+    pred = (a * XOR_POINTS[:, 0] + b * XOR_POINTS[:, 1] + c > 0).astype(int)
+    return int((pred == XOR_LABELS).sum())
+
+
+def draw_line(ax, coef, color, linestyle, linewidth, label):
+    """a*x1 + b*x2 + c = 0 인 직선을 그림 범위 안에 그린다."""
+    a, b, c = coef
+    lo, hi = -0.6, 1.6
+    if abs(b) < 1e-9:                     # 세로선
+        x = -c / a
+        ax.plot([x, x], [lo, hi], color=color, linestyle=linestyle,
+                linewidth=linewidth, label=label, zorder=4)
+    else:
+        xs = np.array([lo, hi])
+        ax.plot(xs, -(a * xs + c) / b, color=color, linestyle=linestyle,
+                linewidth=linewidth, label=label, zorder=4)
 
 
 def draw_xor_points(ax, ko: bool, show_legend: bool = False) -> None:
@@ -177,7 +209,12 @@ def figure_neuron_anatomy(ko: bool, out_path: Path) -> None:
 
 
 def figure_why_activation(ko: bool, out_path: Path) -> None:
-    """그림 5-2: 활성화 함수를 빼면 두 층이 직선 하나로 주저앉는다."""
+    """활성화 없음과 ReLU를 한 그림에 나란히 놓는다. 지금은 쓰지 않는다.
+
+    왼쪽 패널이 fig5-3(XOR)의 오른쪽 칸과, 오른쪽 패널이 fig5-4(층 접힘)의
+    세 번째 칸과 격자 16만 점에서 한 점도 다르지 않아 본문에서 뺐다.
+    아래 main() 의 targets 에도 넣지 않는다.
+    """
     L = _krfont.label
     gx, gy = grid_xy()
     fig, axes = plt.subplots(1, 2, figsize=(10.4, 5.6))
@@ -219,8 +256,106 @@ def figure_why_activation(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+def figure_xor_not_linear(ko: bool, out_path: Path) -> None:
+    """그림 5-3: XOR 네 점은 직선 하나로 나눌 수 없다.
+
+    왼쪽은 네 점의 배치, 가운데는 직선 후보 세 개를 대 본 결과,
+    오른쪽은 가장 잘 맞힌 직선 하나와 그 직선이 틀리는 점이다.
+    맞힌 점 수는 라벨에 적지 않고 line_score 로 그때그때 계산해 넣는다.
+    """
+    L = _krfont.label
+    gx, gy = grid_xy()
+    fig, axes = plt.subplots(1, 3, figsize=(12.6, 5.9))
+
+    common = dict(xlim=(-0.6, 1.6), ylim=(-0.6, 1.6))
+
+    # --- 왼쪽: 네 점의 배치 -------------------------------------------------
+    ax = axes[0]
+    for (xa, ya), (xb, yb), color in [
+        ((0.0, 0.0), (1.0, 1.0), BLUE),      # 정답 0 두 점
+        ((0.0, 1.0), (1.0, 0.0), ORANGE),    # 정답 1 두 점
+    ]:
+        ax.plot([xa, xb], [ya, yb], color=color, linestyle=":",
+                linewidth=1.8, zorder=2)
+    draw_xor_points(ax, ko)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.30),
+              ncol=2, fontsize=9.5, frameon=False)
+    for (x1, x2), answer in zip(XOR_POINTS, XOR_LABELS):
+        dy = 17 if x2 > 0.5 else -26      # 위쪽 점은 위로, 아래쪽 점은 아래로
+        ax.annotate(f"({x1:.0f}, {x2:.0f}) → {answer}",
+                    (x1, x2), textcoords="offset points", xytext=(0, dy),
+                    ha="center", fontsize=10, color="#333333")
+    ax.set_title(L("네 점의 배치", "how the four points sit", ko),
+                 fontsize=12, pad=10)
+    ax.text(0.5, -0.17,
+            L("같은 색 두 점이 서로 대각선으로 마주 본다\n점선이 그 대각선이다",
+              "same-colour points face each other across a diagonal\n"
+              "the dotted lines are those diagonals", ko),
+            ha="center", va="top", transform=ax.transAxes,
+            fontsize=9.5, color="#333333", linespacing=1.5)
+
+    # --- 가운데: 직선 후보 세 개 -------------------------------------------
+    ax = axes[1]
+    for (coef, name), color, style in zip(
+        LINE_CANDIDATES, [GREEN, RED, GRAY], ["-", "--", "-."]
+    ):
+        hit = line_score(coef)
+        draw_line(ax, coef, color, style, 2.2,
+                  L(f"{name} — 4점 중 {hit}점", f"{name} - {hit} of 4", ko))
+    line_handles = list(ax.get_lines())
+    draw_xor_points(ax, ko)
+    ax.legend(handles=line_handles, loc="upper center",
+              bbox_to_anchor=(0.5, -0.17), ncol=1, fontsize=9.5, frameon=False)
+    ax.set_title(L("직선을 어디에 대 봐도", "no matter where the line goes", ko),
+                 fontsize=12, pad=10)
+
+    # --- 오른쪽: 가장 잘 맞힌 직선과 틀리는 점 ------------------------------
+    ax = axes[2]
+    out = network_output(gx, gy, use_relu=False)
+    ax.contourf(gx, gy, (out > 0).astype(int), levels=[-0.5, 0.5, 1.5],
+                cmap=REGION_CMAP)
+    ax.contour(gx, gy, out, levels=[0.0], colors=[GREEN], linewidths=2.4)
+    draw_xor_points(ax, ko)
+
+    pred = (network_output(XOR_POINTS[:, 0], XOR_POINTS[:, 1],
+                           use_relu=False) > 0).astype(int)
+    wrong = pred != XOR_LABELS
+    wrong_handle = ax.scatter(
+        XOR_POINTS[wrong, 0], XOR_POINTS[wrong, 1],
+        marker="o", s=720, facecolor="none", edgecolor=RED,
+        linewidth=3.0, zorder=7,
+        label=L(f"직선이 틀리는 점 {int(wrong.sum())}개",
+                f"{int(wrong.sum())} point the line gets wrong", ko))
+    ax.legend(handles=[wrong_handle], loc="upper center",
+              bbox_to_anchor=(0.5, -0.17), ncol=1, fontsize=9.5, frameon=False)
+    ax.set_title(
+        L(f"가장 잘해도 4점 중 {int((~wrong).sum())}점",
+          f"the best a line does is {int((~wrong).sum())} of 4", ko),
+        fontsize=12, pad=10,
+    )
+
+    for ax in axes:
+        ax.set_xlim(*common["xlim"])
+        ax.set_ylim(*common["ylim"])
+        ax.set_aspect("equal")        # 대각선이 45도로 보이도록 비율을 맞춘다
+        ax.set_xticks([0.0, 0.5, 1.0])
+        ax.set_yticks([0.0, 0.5, 1.0])
+        ax.set_xlabel("x1", fontsize=11)
+        ax.set_ylabel("x2", fontsize=11)
+        ax.grid(alpha=0.2)
+
+    fig.suptitle(
+        L("XOR 네 점은 직선 하나로 나눌 수 없다",
+          "One straight line cannot separate the four XOR points", ko),
+        fontsize=14, y=0.99,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.savefig(out_path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+
+
 def figure_folding_layers(ko: bool, out_path: Path) -> None:
-    """그림 5-3: 은닉 뉴런이 그은 선 두 개를 출력 뉴런이 합친다."""
+    """그림 5-4: 은닉 뉴런이 그은 선 두 개를 출력 뉴런이 합친다."""
     L = _krfont.label
     gx, gy = grid_xy()
     fig, axes = plt.subplots(1, 3, figsize=(12.6, 5.2))
@@ -278,11 +413,11 @@ def main() -> None:
 
     targets = [
         ("fig5-1-neuron-anatomy.png", figure_neuron_anatomy,
-         "뉴런 하나의 구조"),
-        ("fig5-2-why-activation.png", figure_why_activation,
-         "활성화 함수가 없으면 층을 쌓아도 직선 하나"),
-        ("fig5-3-folding-layers.png", figure_folding_layers,
-         "층을 쌓으면 판단 영역이 접힌다"),
+         "그림 5.1 — 뉴런 하나의 구조"),
+        ("fig5-3-xor-not-linear.png", figure_xor_not_linear,
+         "그림 5.3 — XOR 네 점은 직선 하나로 나눌 수 없다"),
+        ("fig5-4-folding-layers.png", figure_folding_layers,
+         "그림 5.4 — 층을 쌓으면 판단 영역이 접힌다"),
     ]
 
     for filename, builder, description in targets:
@@ -292,12 +427,20 @@ def main() -> None:
 
     # 그림에 쓴 신경망이 XOR 네 점을 실제로 맞히는지 숫자로 확인한다.
     print()
-    print("=== 그림 5-2, 5-3에 쓴 신경망의 XOR 네 점 판정 ===")
+    print("=== 그림 5-3, 5-4에 쓴 신경망의 XOR 네 점 판정 ===")
     print(f"{'x1':>4}{'x2':>5}{'정답':>6}{'활성화 없음':>12}{'ReLU 사용':>11}")
     for (x1, x2), answer in zip(XOR_POINTS, XOR_LABELS):
         linear = int(network_output(x1, x2, use_relu=False) > 0)
         relu = int(network_output(x1, x2, use_relu=True) > 0)
         print(f"{x1:>4.0f}{x2:>5.0f}{answer:>6d}{linear:>12d}{relu:>11d}")
+    # 그림 5-3 가운데 칸에 적은 "4점 중 n점"을 숫자로 남긴다.
+    print()
+    print("=== 그림 5-3: 직선 후보가 XOR 네 점 중 몇 점을 맞히는가 ===")
+    for coef, name in LINE_CANDIDATES:
+        print(f"  {name:<16} 4점 중 {line_score(coef)}점")
+    best = max(line_score(coef) for coef, _ in LINE_CANDIDATES)
+    print(f"  위 후보 세 개 중 가장 잘 맞힌 것: 4점 중 {best}점")
+
     print()
     print("이 그림은 개념 설명용이며, 학습으로 찾은 가중치가 아니라 손으로 정한 가중치다.")
 
