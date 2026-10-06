@@ -1,4 +1,4 @@
-# Common packages for 딥러닝 기초 practice code.
+# Common packages for basic deep learning practice code.
 # Install from the project root:
 #   python3 -m pip install -r practice/requirements.txt
 
