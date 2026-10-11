@@ -1,9 +1,10 @@
 """6장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 세 장이다.
+만드는 그림은 네 장이다.
   fig6-1  손실이 무엇인가 - 예측과 정답의 차이를 하나의 숫자로 모으는 과정
   fig6-2  경사하강법의 한 걸음 - 기울기를 보고 내려갈 방향과 보폭을 정한다
   fig6-3  epoch와 batch - 전체를 몇 번 도는가, 한 번에 몇 개씩 보는가
+  fig6-4  학습 곡선 읽는 법 - 곡선 모양 다섯 가지와 세로축 눈금 함정
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
 그림 6-1에 찍히는 숫자는 아래 EXAMPLE_X, EXAMPLE_Y로 직접 계산한 값이다.
@@ -264,6 +265,107 @@ def figure_epoch_batch(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# 그림 6-4 아랫줄에서 쓰는 눈금 함정 예시. 본문 6절에 적은 두 숫자를 그대로 쓴다.
+SCALE_TRAP_HIGH = (237.0, 4.0)
+SCALE_TRAP_LOW = (4.1, 4.0)
+
+
+def figure_curve_shapes(ko: bool, out_path: Path) -> None:
+    """그림 6-4: 학습 곡선의 모양 다섯 가지와 세로축 눈금 함정.
+
+    윗줄 다섯 칸은 표 6.3의 다섯 줄과 같은 순서다. 축에 숫자를 넣지 않는다.
+    모양만 비교하는 도식이고 실험 결과가 아니라는 것을 눈금 없음으로 나타낸다.
+    """
+    L = _krfont.label
+    e = np.linspace(0.0, 1.0, 400)
+
+    shapes = [
+        (
+            L("① 빠르게 내려가다\n평평해진다", "1) drops fast,\nthen flattens", ko),
+            0.08 + 0.92 * np.exp(-6.0 * e),
+            GREEN,
+        ),
+        (
+            L("② 아주 천천히\n내려간다", "2) drops\nvery slowly", ko),
+            0.08 + 0.92 * np.exp(-0.45 * e),
+            ORANGE,
+        ),
+        (
+            L("③ 위로 솟거나\n튄다", "3) rises or\nbounces", ko),
+            0.16 * np.exp(1.5 * e) + 0.07 * np.exp(1.5 * e) * np.sin(13.0 * e),
+            RED,
+        ),
+        (
+            L("④ 처음부터\n평평하다", "4) flat from\nthe start", ko),
+            np.full_like(e, 0.72),
+            RED,
+        ),
+        (
+            L("⑤ 지그재그로 흔들리며\n내려간다", "5) zigzags on\nthe way down", ko),
+            0.10 + 0.90 * np.exp(-4.0 * e)
+            + 0.06 * np.sin(34.0 * e) + 0.035 * np.sin(57.0 * e),
+            BLUE,
+        ),
+    ]
+
+    # tight_layout은 add_subplot으로 만든 칸의 폭을 고르게 잡지 못해
+    # 칸마다 크기가 달라진다. 그래서 여백을 GridSpec에 직접 준다.
+    fig = plt.figure(figsize=(12.6, 7.4))
+    gs = fig.add_gridspec(
+        2, 10, height_ratios=[1.0, 1.25],
+        left=0.085, right=0.985, top=0.845, bottom=0.095,
+        hspace=0.55, wspace=0.95,
+    )
+
+    for i, (title, curve, color) in enumerate(shapes):
+        ax = fig.add_subplot(gs[0, 2 * i:2 * i + 2])
+        ax.plot(e, curve, color=color, linewidth=2.4)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1.45)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_title(title, fontsize=10.5, pad=9, linespacing=1.4)
+        ax.set_xlabel(L("에포크", "epoch", ko), fontsize=9.5, labelpad=3)
+        if i == 0:
+            ax.set_ylabel(L("손실", "loss", ko), fontsize=9.5, labelpad=10)
+
+    # 아랫줄: 모양은 같고 세로축 눈금만 다른 두 곡선
+    traps = [
+        (gs[1, 0:5], SCALE_TRAP_HIGH, (0.0, 265.0), BLUE),
+        (gs[1, 5:10], SCALE_TRAP_LOW, (3.975, 4.125), ORANGE),
+    ]
+
+    for spec, (start, end), ylim, color in traps:
+        ax = fig.add_subplot(spec)
+        ax.plot(e, end + (start - end) * np.exp(-5.0 * e), color=color, linewidth=2.6)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(*ylim)
+        ax.set_xticks([])
+        ax.set_xlabel(L("에포크", "epoch", ko), fontsize=10)
+        ax.set_ylabel(L("손실", "loss", ko), fontsize=10)
+        ax.set_title(
+            L(f"손실 {start:g} 에서 {end:g} 까지 — {start - end:g} 만큼 줄었다",
+              f"loss {start:g} to {end:g} - dropped by {start - end:g}", ko),
+            fontsize=11.5, pad=8, color=color,
+        )
+        ax.grid(alpha=0.25)
+
+    fig.suptitle(
+        L("학습 곡선 — 모양 다섯 가지(위)와 세로축 눈금 함정(아래)",
+          "Learning curves - five shapes (top) and the y-axis scale trap (bottom)", ko),
+        fontsize=14, y=0.962,
+    )
+    fig.text(
+        0.5, 0.022,
+        L("아래 두 곡선의 모양은 같다. 세로축 눈금을 읽지 않으면 둘을 같은 성과로 본다.",
+          "The two curves below have the same shape. Without reading the y-axis, "
+          "they look like the same result.", ko),
+        ha="center", fontsize=11.5, color="#333333",
+    )
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -281,6 +383,13 @@ def main() -> None:
 
     figure_epoch_batch(ko, RESULTS_DIR / "fig6-3-epoch-batch.png")
     print("저장: results/fig6-3-epoch-batch.png  (epoch와 batch의 관계)")
+
+    figure_curve_shapes(ko, RESULTS_DIR / "fig6-4-curve-shapes.png")
+    print("저장: results/fig6-4-curve-shapes.png  (학습 곡선의 모양과 눈금 함정)")
+    print(f"  눈금 함정 왼쪽: {SCALE_TRAP_HIGH[0]:g} -> {SCALE_TRAP_HIGH[1]:g}"
+          f" (차이 {SCALE_TRAP_HIGH[0] - SCALE_TRAP_HIGH[1]:g})")
+    print(f"  눈금 함정 오른쪽: {SCALE_TRAP_LOW[0]:g} -> {SCALE_TRAP_LOW[1]:g}"
+          f" (차이 {SCALE_TRAP_LOW[0] - SCALE_TRAP_LOW[1]:g})")
 
     print()
     print("이 그림은 개념 설명용 도식이며, 실험 결과가 아니다.")
