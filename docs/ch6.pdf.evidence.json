@@ -1,9 +1,9 @@
 {
   "source_markdown": "docs\\ch6.md",
-  "source_sha256": "0c19c00149533d60da59bcce4ebcfd25a4f8ebd41da82975eeb229e8c9b974b2",
+  "source_sha256": "abf6b0e145644b83d136f708720f5db9e32a923cca7c499f811f2259eaf3c1e1",
   "output_pdf": "docs\\ch6.pdf",
-  "output_bytes": 1254218,
-  "generated_at": "2026-10-13T10:20:48.904463+09:00",
+  "output_bytes": 1237133,
+  "generated_at": "2026-10-13T11:24:31.486866+09:00",
   "pandoc": "pandoc 3.9",
   "browser": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
 }

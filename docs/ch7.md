@@ -273,7 +273,7 @@ _출처: `practice/chapter4/results/4-1-simple-classifier.log`_
 | Google 머신러닝 단기집중과정(한국어), 정규화 | L2 정규화를 가중치 제곱합으로 정의하고, 정규화율을 높였을 때와 낮췄을 때 가중치 분포가 어떻게 달라지는지 히스토그램 두 장으로 비교한다 | https://developers.google.com/machine-learning/crash-course/overfitting/regularization?hl=ko |
 | TensorFlow Playground | Regularization을 None·L1·L2 중에서 고르고, Noise와 훈련·테스트 데이터 비율을 조절하며 Training loss와 Test loss가 벌어지는 것을 본다 | https://playground.tensorflow.org/ |
 
-○ TensorFlow Playground는 6장에서 학습률을 바꿔 보는 데 썼다. 이번에는 다른 손잡이를 돌린다. **Ratio of training to test data**를 10%까지 내리고, **Noise**를 50까지 올린 뒤 층을 여러 개 쌓으면 Training loss만 내려가고 Test loss가 따라오지 않는 상태를 만들 수 있다. 그 상태에서 Regularization을 L2로 바꾸면 두 값이 어떻게 달라지는지 본다
+○ TensorFlow Playground는 6장 웹 자료 표에서 소개했다. 이번에는 학습률이 아닌 다른 손잡이를 돌린다. **Ratio of training to test data**를 10%까지 내리고, **Noise**를 50까지 올린 뒤 층을 여러 개 쌓으면 Training loss만 내려가고 Test loss가 따라오지 않는 상태를 만들 수 있다. 그 상태에서 Regularization을 L2로 바꾸면 두 값이 어떻게 달라지는지 본다
 
 ○ MLU-Explain의 K 조절은 표 7.2의 마지막 줄과 짝이 된다. K를 줄이면 복잡해진다는 말이 눈으로 확인된다
 
