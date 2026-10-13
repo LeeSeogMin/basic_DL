@@ -1,7 +1,6 @@
 """6장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 여섯 장이다.
-  fig6-1            손실이 무엇인가 - 예측과 정답의 차이를 하나의 숫자로 모으는 과정
+만드는 그림은 다섯 장이다.
   fig6-cross-entropy 분류의 손실 - 정답 쪽 확률이 낮을수록 손실이 커진다
   fig6-2            경사하강법의 한 걸음 - 기울기를 보고 내려갈 방향과 보폭을 정한다
   fig6-backprop     역전파 - 출력 쪽에서 입력 쪽으로 곱셈을 이어 가며 기울기를 구한다
@@ -9,8 +8,8 @@
   fig6-4            학습 곡선 읽는 법 - 곡선 모양 다섯 가지와 세로축 눈금 함정
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
-그림 6-1에 찍히는 숫자는 아래 EXAMPLE_X, EXAMPLE_Y로 직접 계산한 값이다.
-교차 엔트로피와 역전파 그림의 숫자도 아래 상수로 직접 계산해 로그에 남긴다.
+교차 엔트로피와 역전파 그림의 숫자는 아래 상수로 직접 계산해 로그에 남긴다.
+회귀의 평균제곱오차 예시(점 5개)는 그림 없이 숫자만 로그에 남긴다.
 """
 
 from __future__ import annotations
@@ -32,7 +31,7 @@ GREEN = "#54A24B"
 RED = "#E45756"
 GRAY = "#79706E"
 
-# 그림 6-1에서 쓰는 작은 예시 (점 5개). 개념 설명용으로 손으로 고른 값이다.
+# 평균제곱오차 예시 (점 5개). 개념 설명용으로 손으로 고른 값이다.
 EXAMPLE_X = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
 EXAMPLE_Y = np.array([3.0, 5.8, 6.0, 9.0, 9.4])
 EXAMPLE_SLOPE = 1.5
@@ -76,73 +75,11 @@ def arrow(ax, x1, y1, x2, y2, color=GRAY, width=1.6):
     )
 
 
-def figure_what_is_loss(ko: bool, out_path: Path) -> tuple[np.ndarray, float]:
-    """그림 6-1: 차이를 모아 하나의 숫자로 만든다."""
-    L = _krfont.label
+def mse_example() -> tuple[np.ndarray, float]:
+    """회귀의 평균제곱오차 예시: 차이를 재고, 제곱하고, 평균 낸다."""
     pred = EXAMPLE_SLOPE * EXAMPLE_X + EXAMPLE_INTERCEPT
     diff = EXAMPLE_Y - pred
-    squared = diff ** 2
-    mse = float(squared.mean())
-
-    fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.8))
-
-    # 왼쪽: 점, 선, 그리고 둘 사이의 차이
-    ax = axes[0]
-    grid = np.linspace(0.4, 5.6, 50)
-    ax.plot(grid, EXAMPLE_SLOPE * grid + EXAMPLE_INTERCEPT,
-            color=GREEN, linewidth=2.6,
-            label=L("모델의 예측", "model prediction", ko))
-    ax.scatter(EXAMPLE_X, EXAMPLE_Y, s=90, color=BLUE, zorder=3,
-               edgecolor="white", linewidth=0.8,
-               label=L("정답", "true answer", ko))
-    for xi, yi, pi, di in zip(EXAMPLE_X, EXAMPLE_Y, pred, diff):
-        ax.plot([xi, xi], [pi, yi], color=RED, linewidth=2.2, zorder=2)
-        # 차이 숫자는 점 쪽에 붙여 둔다. 가운데에 두면 초록 선과 겹친다.
-        ax.text(xi + 0.18, pi + 0.75 * di, f"{di:+.1f}",
-                fontsize=10, color=RED, va="center")
-
-    ax.set_xlim(0.3, 5.9)
-    ax.set_ylim(2.0, 11.0)
-    ax.set_xlabel(L("입력", "input", ko), fontsize=11)
-    ax.set_ylabel(L("출력", "output", ko), fontsize=11)
-    ax.set_title(L("① 예측과 정답의 차이를 잰다",
-                   "1) measure each gap", ko), fontsize=12.5, pad=10)
-    ax.legend(loc="upper left", fontsize=9.5, frameon=False)
-    ax.grid(alpha=0.25)
-
-    # 오른쪽: 차이를 제곱해 쌓고, 평균 하나로 줄인다
-    ax = axes[1]
-    positions = np.arange(1, len(squared) + 1)
-    ax.bar(positions, squared, width=0.55, color=RED, alpha=0.85)
-    for p, s in zip(positions, squared):
-        ax.text(p, s + 0.03, f"{s:.2f}", ha="center", fontsize=9.5, color="#333333")
-
-    ax.set_xlim(0.3, 5.9)
-    ax.set_ylim(0, 1.45)
-    ax.set_xticks(positions)
-    ax.set_xlabel(L("점 번호", "point index", ko), fontsize=11)
-    ax.set_ylabel(L("차이를 제곱한 값", "squared gap", ko), fontsize=11)
-    ax.set_title(L("② 제곱해서 더하고 개수로 나눈다",
-                   "2) square, sum, divide by count", ko), fontsize=12.5, pad=10)
-    ax.grid(alpha=0.25, axis="y")
-
-    ax.text(
-        3.1, 1.22,
-        L(f"손실 = {squared.sum():.2f} ÷ 5 = {mse:.2f}",
-          f"loss = {squared.sum():.2f} / 5 = {mse:.2f}", ko),
-        ha="center", fontsize=13, color="white",
-        bbox=dict(boxstyle="round,pad=0.45", facecolor=BLUE, edgecolor="none"),
-    )
-
-    fig.suptitle(
-        L("손실 - 여러 개의 틀린 정도를 숫자 하나로 모은다",
-          "Loss - many gaps collapsed into a single number", ko),
-        fontsize=14,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
-    fig.savefig(out_path, dpi=160)
-    plt.close(fig)
-    return diff, mse
+    return diff, float((diff ** 2).mean())
 
 
 def figure_one_step(ko: bool, out_path: Path) -> None:
@@ -441,12 +378,18 @@ def figure_cross_entropy(ko: bool, out_path: Path) -> list[tuple[float, float, f
     return rows
 
 
-# 역전파 그림의 계산 사슬: x -(x w1)-> h -(x w2)-> y -> 손실 (y - target)^2
+# 역전파 그림의 계산 사슬:
+#   x -(x w1)-> h -(x w2)-> z -(시그모이드)-> 통과 확률 p -> 손실 -log(p)
+# 정답은 "통과"(1)다. w2를 음수로 두어 처음 예측이 틀린 쪽(p < 0.5)에서 시작한다.
 BP_X = 2.0
 BP_W1 = 0.5
-BP_W2 = 3.0
+BP_W2 = -1.0
 BP_TARGET = 1.0
 BP_NUDGE = 0.001
+
+
+def sigmoid(z: float) -> float:
+    return float(1.0 / (1.0 + np.exp(-z)))
 
 
 def backprop_numbers() -> dict[str, float]:
@@ -454,18 +397,20 @@ def backprop_numbers() -> dict[str, float]:
 
     def loss_of(w1: float, w2: float) -> float:
         h = BP_X * w1
-        y = h * w2
-        return (y - BP_TARGET) ** 2
+        z = h * w2
+        return -float(np.log(sigmoid(z)))   # 정답이 통과이므로 통과 확률에 -log
 
     # 순전파
     h = BP_X * BP_W1
-    y = h * BP_W2
-    loss = (y - BP_TARGET) ** 2
+    z = h * BP_W2
+    p = sigmoid(z)
+    loss = -float(np.log(p))
 
     # 역전파: 뒤에서 받은 값 x 이 칸에서 곱한 수
-    d_y = 2.0 * (y - BP_TARGET)   # 손실이 y에 얼마나 민감한가
-    d_w2 = d_y * h                # w2에는 h가 곱해져 들어갔다
-    d_h = d_y * BP_W2             # h에는 w2가 곱해졌다
+    # 시그모이드와 교차 엔트로피를 이어 붙이면, 손실이 z에 민감한 정도는 p - 정답 하나로 줄어든다.
+    d_z = p - BP_TARGET
+    d_w2 = d_z * h                # w2에는 h가 곱해져 들어갔다
+    d_h = d_z * BP_W2             # h에는 w2가 곱해졌다
     d_w1 = d_h * BP_X             # w1에는 x가 곱해져 들어갔다
 
     # 수치 확인: 가중치를 조금 바꿔 손실이 실제로 얼마나 변하는지 잰다
@@ -473,8 +418,8 @@ def backprop_numbers() -> dict[str, float]:
     num_w2 = (loss_of(BP_W1, BP_W2 + BP_NUDGE) - loss) / BP_NUDGE
 
     return {
-        "h": h, "y": y, "loss": loss,
-        "d_y": d_y, "d_w2": d_w2, "d_h": d_h, "d_w1": d_w1,
+        "h": h, "z": z, "p": p, "loss": loss,
+        "d_z": d_z, "d_w2": d_w2, "d_h": d_h, "d_w1": d_w1,
         "num_w1": num_w1, "num_w2": num_w2,
     }
 
@@ -484,72 +429,70 @@ def figure_backprop(ko: bool, out_path: Path) -> dict[str, float]:
     L = _krfont.label
     n = backprop_numbers()
 
-    fig, ax = plt.subplots(figsize=(12.0, 4.6))
-    ax.set_xlim(0, 13.0)
+    fig, ax = plt.subplots(figsize=(12.6, 4.8))
+    ax.set_xlim(0, 13.4)
     ax.set_ylim(0, 5.9)
     ax.axis("off")
 
-    # 칸 네 개: x, h, y, 손실
-    node_x = [0.5, 3.9, 7.3, 10.7]
-    node_w = 1.8
+    # 칸 네 개: x, h, z, (통과 확률과 손실)
+    node_x = [0.3, 3.3, 6.3, 9.5]
+    node_w = [1.8, 1.8, 1.8, 3.6]
     node_y = 3.4
     node_h = 1.0
     names = [
         L(f"입력 x\n{BP_X:g}", f"input x\n{BP_X:g}", ko),
         L(f"h = x × w1\n{n['h']:g}", f"h = x * w1\n{n['h']:g}", ko),
-        L(f"예측 y = h × w2\n{n['y']:g}", f"pred y = h * w2\n{n['y']:g}", ko),
-        L(f"손실 (y - {BP_TARGET:g})²\n{n['loss']:g}",
-          f"loss (y - {BP_TARGET:g})^2\n{n['loss']:g}", ko),
+        L(f"z = h × w2\n{n['z']:g}", f"z = h * w2\n{n['z']:g}", ko),
+        L(f"통과 확률 p = 시그모이드(z) = {n['p']:.3f}\n손실 = -log(p) = {n['loss']:.3f}",
+          f"p = sigmoid(z) = {n['p']:.3f}\nloss = -log(p) = {n['loss']:.3f}", ko),
     ]
     colors = [GRAY, BLUE, BLUE, RED]
-    for xi, name, c in zip(node_x, names, colors):
-        box(ax, xi, node_y, node_w, node_h, name, c, fontsize=11)
+    for xi, wi, name, c in zip(node_x, node_w, names, colors):
+        box(ax, xi, node_y, wi, node_h, name, c, fontsize=10.5)
 
     # 윗줄: 순전파 화살표와 곱한 가중치
     forward_labels = [
         L(f"× w1 ({BP_W1:g})", f"x w1 ({BP_W1:g})", ko),
         L(f"× w2 ({BP_W2:g})", f"x w2 ({BP_W2:g})", ko),
-        L(f"정답 {BP_TARGET:g}과 비교", f"compare with {BP_TARGET:g}", ko),
+        L("시그모이드", "sigmoid", ko),
     ]
     for i, lab in enumerate(forward_labels):
-        x1 = node_x[i] + node_w + 0.08
+        x1 = node_x[i] + node_w[i] + 0.08
         x2 = node_x[i + 1] - 0.08
         arrow(ax, x1, node_y + 0.75, x2, node_y + 0.75, color=BLUE, width=2.0)
-        ax.text((x1 + x2) / 2, node_y + 1.05, lab, ha="center", fontsize=10.5, color=BLUE)
+        ax.text((x1 + x2) / 2, node_y + 1.05, lab, ha="center", fontsize=10, color=BLUE)
 
-    ax.text(0.5, 5.35,
+    ax.text(0.3, 5.35,
             L("① 순전파 - 왼쪽에서 오른쪽으로 값을 계산한다",
               "1) forward pass - compute values left to right", ko),
             fontsize=12.5, color=BLUE)
 
     # 아랫줄: 역전파 화살표와 곱셈
     backward = [
-        # (from node, to node, 화살표 아래 설명)
-        (3, 2, L(f"2 × (y - {BP_TARGET:g}) = {n['d_y']:g}",
-                 f"2 * (y - {BP_TARGET:g}) = {n['d_y']:g}", ko)),
-        (2, 1, L(f"{n['d_y']:g} × w2 = {n['d_h']:g}",
-                 f"{n['d_y']:g} * w2 = {n['d_h']:g}", ko)),
+        (3, 2, L(f"p - 정답 = {n['d_z']:.3f}", f"p - target = {n['d_z']:.3f}", ko)),
+        (2, 1, L(f"{n['d_z']:.3f} × w2 = {n['d_h']:.3f}",
+                 f"{n['d_z']:.3f} * w2 = {n['d_h']:.3f}", ko)),
     ]
     for src, dst, lab in backward:
         x1 = node_x[src] - 0.08
-        x2 = node_x[dst] + node_w + 0.08
+        x2 = node_x[dst] + node_w[dst] + 0.08
         arrow(ax, x1, node_y + 0.25, x2, node_y + 0.25, color=RED, width=2.0)
         ax.text((x1 + x2) / 2, node_y - 0.25, lab, ha="center", fontsize=10.5, color=RED)
 
     # 가중치 기울기 상자 두 개
     grad_y = 1.0
-    box(ax, 6.2, grad_y, 3.6, 1.0,
-        L(f"w2의 기울기 = {n['d_y']:g} × h({n['h']:g}) = {n['d_w2']:g}",
-          f"grad of w2 = {n['d_y']:g} * h({n['h']:g}) = {n['d_w2']:g}", ko),
+    box(ax, 5.7, grad_y, 4.0, 1.0,
+        L(f"w2의 기울기 = {n['d_z']:.3f} × h({n['h']:g}) = {n['d_w2']:.3f}",
+          f"grad of w2 = {n['d_z']:.3f} * h({n['h']:g}) = {n['d_w2']:.3f}", ko),
         ORANGE, fontsize=10.5)
-    box(ax, 1.6, grad_y, 3.6, 1.0,
-        L(f"w1의 기울기 = {n['d_h']:g} × x({BP_X:g}) = {n['d_w1']:g}",
-          f"grad of w1 = {n['d_h']:g} * x({BP_X:g}) = {n['d_w1']:g}", ko),
+    box(ax, 1.0, grad_y, 4.0, 1.0,
+        L(f"w1의 기울기 = {n['d_h']:.3f} × x({BP_X:g}) = {n['d_w1']:.3f}",
+          f"grad of w1 = {n['d_h']:.3f} * x({BP_X:g}) = {n['d_w1']:.3f}", ko),
         ORANGE, fontsize=10.5)
-    arrow(ax, 8.2, node_y - 0.05, 8.0, grad_y + 1.05, color=ORANGE, width=1.6)
-    arrow(ax, 4.8, node_y - 0.05, 3.4, grad_y + 1.05, color=ORANGE, width=1.6)
+    arrow(ax, 7.4, node_y - 0.05, 7.6, grad_y + 1.05, color=ORANGE, width=1.6)
+    arrow(ax, 4.2, node_y - 0.05, 3.0, grad_y + 1.05, color=ORANGE, width=1.6)
 
-    ax.text(0.5, 0.25,
+    ax.text(0.3, 0.25,
             L("② 역전파 - 오른쪽에서 왼쪽으로, 뒤에서 받은 값 × 이 칸에서 곱한 수",
               "2) backward pass - right to left, (value from behind) x (number multiplied here)",
               ko),
@@ -568,11 +511,6 @@ def main() -> None:
 
     print("=== 6장 개념 그림 생성 ===")
 
-    diff, mse = figure_what_is_loss(ko, RESULTS_DIR / "fig6-1-what-is-loss.png")
-    print("저장: results/fig6-1-what-is-loss.png  (손실을 하나의 숫자로 모으는 과정)")
-    print(f"  예시 5개의 차이: {np.array2string(diff, precision=1, floatmode='fixed')}")
-    print(f"  차이를 제곱해 평균 낸 값(손실): {mse:.2f}")
-
     rows = figure_cross_entropy(ko, RESULTS_DIR / "fig6-cross-entropy.png")
     print("저장: results/fig6-cross-entropy.png  (분류의 손실, 교차 엔트로피)")
     print("  정답 쪽 확률 p    교차 엔트로피 -log(p)    제곱 오차 (1-p)^2")
@@ -584,14 +522,20 @@ def main() -> None:
 
     n = figure_backprop(ko, RESULTS_DIR / "fig6-backprop.png")
     print("저장: results/fig6-backprop.png  (역전파)")
-    print(f"  순전파: x = {BP_X:g}, w1 = {BP_W1:g}, w2 = {BP_W2:g}, 정답 = {BP_TARGET:g}")
-    print(f"          h = {n['h']:g}, y = {n['y']:g}, 손실 = {n['loss']:g}")
-    print(f"  역전파: 손실이 y에 민감한 정도 = {n['d_y']:g}")
-    print(f"          손실이 h에 민감한 정도 = {n['d_h']:g}")
-    print(f"          w2의 기울기 = {n['d_w2']:g}, w1의 기울기 = {n['d_w1']:g}")
+    print(f"  순전파: x = {BP_X:g}, w1 = {BP_W1:g}, w2 = {BP_W2:g}, 정답 = 통과({BP_TARGET:g})")
+    print(f"          h = {n['h']:g}, z = {n['z']:g}, 통과 확률 p = {n['p']:.3f}, 손실 -log(p) = {n['loss']:.3f}")
+    print(f"  역전파: 손실이 z에 민감한 정도 = p - 정답 = {n['d_z']:.3f}")
+    print(f"          손실이 h에 민감한 정도 = {n['d_z']:.3f} x w2 = {n['d_h']:.3f}")
+    print(f"          w2의 기울기 = {n['d_w2']:.3f}, w1의 기울기 = {n['d_w1']:.3f}")
     print(f"  수치 확인: 가중치를 {BP_NUDGE:g} 키웠을 때 (손실 변화 ÷ {BP_NUDGE:g})")
-    print(f"          w1: {n['num_w1']:.3f}  (역전파 값 {n['d_w1']:g})")
-    print(f"          w2: {n['num_w2']:.3f}  (역전파 값 {n['d_w2']:g})")
+    print(f"          w1: {n['num_w1']:.3f}  (역전파 값 {n['d_w1']:.3f})")
+    print(f"          w2: {n['num_w2']:.3f}  (역전파 값 {n['d_w2']:.3f})")
+
+    diff, mse = mse_example()
+    print("회귀의 손실 예시 (그림 없음): 평균제곱오차")
+    print(f"  예시 5개의 차이(정답 - 예측): {np.array2string(diff, precision=1, floatmode='fixed')}")
+    print(f"  차이를 제곱한 값: {np.array2string(diff ** 2, precision=2, floatmode='fixed')}")
+    print(f"  제곱한 값의 평균(손실): {mse:.2f}")
 
     figure_epoch_batch(ko, RESULTS_DIR / "fig6-3-epoch-batch.png")
     print("저장: results/fig6-3-epoch-batch.png  (epoch와 batch의 관계)")

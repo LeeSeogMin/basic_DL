@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -70,11 +71,15 @@ def run_one(py_file: Path, timeout: int) -> tuple[dict, str]:
     started_iso = datetime.now(timezone.utc).astimezone().isoformat()
 
     try:
+        # 실습 코드는 출력을 UTF-8로 내고, 여기서도 UTF-8로 읽는다.
+        # 지정하지 않으면 Windows에서 시스템 기본 인코딩(cp949)으로 읽어 한글 로그가 깨진다.
         proc = subprocess.run(
             [sys.executable, py_file.name],
             cwd=py_file.parent,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
             timeout=timeout,
         )
         exit_code = proc.returncode
