@@ -1,13 +1,16 @@
 """6장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 네 장이다.
-  fig6-1  손실이 무엇인가 - 예측과 정답의 차이를 하나의 숫자로 모으는 과정
-  fig6-2  경사하강법의 한 걸음 - 기울기를 보고 내려갈 방향과 보폭을 정한다
-  fig6-3  epoch와 batch - 전체를 몇 번 도는가, 한 번에 몇 개씩 보는가
-  fig6-4  학습 곡선 읽는 법 - 곡선 모양 다섯 가지와 세로축 눈금 함정
+만드는 그림은 여섯 장이다.
+  fig6-1            손실이 무엇인가 - 예측과 정답의 차이를 하나의 숫자로 모으는 과정
+  fig6-cross-entropy 분류의 손실 - 정답 쪽 확률이 낮을수록 손실이 커진다
+  fig6-2            경사하강법의 한 걸음 - 기울기를 보고 내려갈 방향과 보폭을 정한다
+  fig6-backprop     역전파 - 출력 쪽에서 입력 쪽으로 곱셈을 이어 가며 기울기를 구한다
+  fig6-3            epoch와 batch - 전체를 몇 번 도는가, 한 번에 몇 개씩 보는가
+  fig6-4            학습 곡선 읽는 법 - 곡선 모양 다섯 가지와 세로축 눈금 함정
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
 그림 6-1에 찍히는 숫자는 아래 EXAMPLE_X, EXAMPLE_Y로 직접 계산한 값이다.
+교차 엔트로피와 역전파 그림의 숫자도 아래 상수로 직접 계산해 로그에 남긴다.
 """
 
 from __future__ import annotations
@@ -366,6 +369,198 @@ def figure_curve_shapes(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# 교차 엔트로피 그림에서 점을 찍을 확률. "정답 쪽에 준 확률"이다.
+CE_PROBS = [0.9, 0.5, 0.1, 0.01]
+
+
+def figure_cross_entropy(ko: bool, out_path: Path) -> list[tuple[float, float, float]]:
+    """교차 엔트로피 그림: 정답 쪽 확률 p에 대한 손실 -log(p).
+
+    왼쪽 칸은 -log(p) 곡선과 점 네 개, 오른쪽 칸은 같은 p에서
+    (1 - p)^2 (MSE식)과 -log(p)를 나란히 놓는다.
+    돌려주는 값: (p, -log p, (1-p)^2) 목록.
+    """
+    L = _krfont.label
+    p = np.linspace(0.005, 1.0, 400)
+    ce = -np.log(p)
+    sq = (1.0 - p) ** 2
+
+    rows = [(pi, float(-np.log(pi)), float((1.0 - pi) ** 2)) for pi in CE_PROBS]
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.8))
+
+    # 왼쪽: -log(p)
+    ax = axes[0]
+    ax.plot(p, ce, color=RED, linewidth=2.6)
+    offsets = {0.9: (-0.30, 0.55), 0.5: (0.03, 0.45), 0.1: (0.05, 0.25), 0.01: (0.05, 0.0)}
+    for pi, ce_i, _ in rows:
+        ax.scatter([pi], [ce_i], s=80, color=RED, zorder=3,
+                   edgecolor="white", linewidth=0.8)
+        dx, dy = offsets[pi]
+        ax.text(pi + dx, ce_i + dy,
+                L(f"p={pi:g} → 손실 {ce_i:.2f}", f"p={pi:g} -> loss {ce_i:.2f}", ko),
+                fontsize=10, color="#333333", va="center")
+    ax.set_xlim(0, 1.05)
+    ax.set_ylim(0, 5.6)
+    ax.set_xlabel(L("정답 쪽에 준 확률 p", "probability given to the true class, p", ko),
+                  fontsize=11)
+    ax.set_ylabel(L("손실 = -log(p)", "loss = -log(p)", ko), fontsize=11)
+    ax.set_title(L("① 정답 확률이 낮을수록 손실이 커진다",
+                   "1) lower probability on the answer, larger loss", ko),
+                 fontsize=12.5, pad=10)
+    ax.grid(alpha=0.25)
+
+    # 오른쪽: MSE식과 비교
+    ax = axes[1]
+    ax.plot(p, ce, color=RED, linewidth=2.6,
+            label=L("교차 엔트로피 -log(p)", "cross-entropy -log(p)", ko))
+    ax.plot(p, sq, color=BLUE, linewidth=2.6,
+            label=L("제곱 오차 (1 - p)²", "squared error (1 - p)^2", ko))
+    ax.axhline(1.0, color=BLUE, linestyle=":", linewidth=1.2)
+    ax.text(0.40, 1.18, L("제곱 오차는 1을 넘지 못한다", "squared error never exceeds 1", ko),
+            fontsize=10, color=BLUE)
+    ax.set_xlim(0, 1.05)
+    ax.set_ylim(0, 5.6)
+    ax.set_xlabel(L("정답 쪽에 준 확률 p", "probability given to the true class, p", ko),
+                  fontsize=11)
+    ax.set_ylabel(L("손실", "loss", ko), fontsize=11)
+    ax.set_title(L("② 확신하고 틀릴 때 두 손실의 차이",
+                   "2) confidently wrong: the two losses differ", ko),
+                 fontsize=12.5, pad=10)
+    ax.legend(loc="upper right", fontsize=10, frameon=False)
+    ax.grid(alpha=0.25)
+
+    fig.suptitle(
+        L("분류의 손실 - 정답에 준 확률만 보고 -log를 씌운다",
+          "Classification loss - take -log of the probability on the answer", ko),
+        fontsize=14,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+    return rows
+
+
+# 역전파 그림의 계산 사슬: x -(x w1)-> h -(x w2)-> y -> 손실 (y - target)^2
+BP_X = 2.0
+BP_W1 = 0.5
+BP_W2 = 3.0
+BP_TARGET = 1.0
+BP_NUDGE = 0.001
+
+
+def backprop_numbers() -> dict[str, float]:
+    """역전파 예제의 순전파 값, 역전파 값, 수치 확인 값을 계산한다."""
+
+    def loss_of(w1: float, w2: float) -> float:
+        h = BP_X * w1
+        y = h * w2
+        return (y - BP_TARGET) ** 2
+
+    # 순전파
+    h = BP_X * BP_W1
+    y = h * BP_W2
+    loss = (y - BP_TARGET) ** 2
+
+    # 역전파: 뒤에서 받은 값 x 이 칸에서 곱한 수
+    d_y = 2.0 * (y - BP_TARGET)   # 손실이 y에 얼마나 민감한가
+    d_w2 = d_y * h                # w2에는 h가 곱해져 들어갔다
+    d_h = d_y * BP_W2             # h에는 w2가 곱해졌다
+    d_w1 = d_h * BP_X             # w1에는 x가 곱해져 들어갔다
+
+    # 수치 확인: 가중치를 조금 바꿔 손실이 실제로 얼마나 변하는지 잰다
+    num_w1 = (loss_of(BP_W1 + BP_NUDGE, BP_W2) - loss) / BP_NUDGE
+    num_w2 = (loss_of(BP_W1, BP_W2 + BP_NUDGE) - loss) / BP_NUDGE
+
+    return {
+        "h": h, "y": y, "loss": loss,
+        "d_y": d_y, "d_w2": d_w2, "d_h": d_h, "d_w1": d_w1,
+        "num_w1": num_w1, "num_w2": num_w2,
+    }
+
+
+def figure_backprop(ko: bool, out_path: Path) -> dict[str, float]:
+    """역전파 그림: 윗줄 순전파(값), 아랫줄 역전파(손실이 그 값에 얼마나 민감한가)."""
+    L = _krfont.label
+    n = backprop_numbers()
+
+    fig, ax = plt.subplots(figsize=(12.0, 4.6))
+    ax.set_xlim(0, 13.0)
+    ax.set_ylim(0, 5.9)
+    ax.axis("off")
+
+    # 칸 네 개: x, h, y, 손실
+    node_x = [0.5, 3.9, 7.3, 10.7]
+    node_w = 1.8
+    node_y = 3.4
+    node_h = 1.0
+    names = [
+        L(f"입력 x\n{BP_X:g}", f"input x\n{BP_X:g}", ko),
+        L(f"h = x × w1\n{n['h']:g}", f"h = x * w1\n{n['h']:g}", ko),
+        L(f"예측 y = h × w2\n{n['y']:g}", f"pred y = h * w2\n{n['y']:g}", ko),
+        L(f"손실 (y - {BP_TARGET:g})²\n{n['loss']:g}",
+          f"loss (y - {BP_TARGET:g})^2\n{n['loss']:g}", ko),
+    ]
+    colors = [GRAY, BLUE, BLUE, RED]
+    for xi, name, c in zip(node_x, names, colors):
+        box(ax, xi, node_y, node_w, node_h, name, c, fontsize=11)
+
+    # 윗줄: 순전파 화살표와 곱한 가중치
+    forward_labels = [
+        L(f"× w1 ({BP_W1:g})", f"x w1 ({BP_W1:g})", ko),
+        L(f"× w2 ({BP_W2:g})", f"x w2 ({BP_W2:g})", ko),
+        L(f"정답 {BP_TARGET:g}과 비교", f"compare with {BP_TARGET:g}", ko),
+    ]
+    for i, lab in enumerate(forward_labels):
+        x1 = node_x[i] + node_w + 0.08
+        x2 = node_x[i + 1] - 0.08
+        arrow(ax, x1, node_y + 0.75, x2, node_y + 0.75, color=BLUE, width=2.0)
+        ax.text((x1 + x2) / 2, node_y + 1.05, lab, ha="center", fontsize=10.5, color=BLUE)
+
+    ax.text(0.5, 5.35,
+            L("① 순전파 - 왼쪽에서 오른쪽으로 값을 계산한다",
+              "1) forward pass - compute values left to right", ko),
+            fontsize=12.5, color=BLUE)
+
+    # 아랫줄: 역전파 화살표와 곱셈
+    backward = [
+        # (from node, to node, 화살표 아래 설명)
+        (3, 2, L(f"2 × (y - {BP_TARGET:g}) = {n['d_y']:g}",
+                 f"2 * (y - {BP_TARGET:g}) = {n['d_y']:g}", ko)),
+        (2, 1, L(f"{n['d_y']:g} × w2 = {n['d_h']:g}",
+                 f"{n['d_y']:g} * w2 = {n['d_h']:g}", ko)),
+    ]
+    for src, dst, lab in backward:
+        x1 = node_x[src] - 0.08
+        x2 = node_x[dst] + node_w + 0.08
+        arrow(ax, x1, node_y + 0.25, x2, node_y + 0.25, color=RED, width=2.0)
+        ax.text((x1 + x2) / 2, node_y - 0.25, lab, ha="center", fontsize=10.5, color=RED)
+
+    # 가중치 기울기 상자 두 개
+    grad_y = 1.0
+    box(ax, 6.2, grad_y, 3.6, 1.0,
+        L(f"w2의 기울기 = {n['d_y']:g} × h({n['h']:g}) = {n['d_w2']:g}",
+          f"grad of w2 = {n['d_y']:g} * h({n['h']:g}) = {n['d_w2']:g}", ko),
+        ORANGE, fontsize=10.5)
+    box(ax, 1.6, grad_y, 3.6, 1.0,
+        L(f"w1의 기울기 = {n['d_h']:g} × x({BP_X:g}) = {n['d_w1']:g}",
+          f"grad of w1 = {n['d_h']:g} * x({BP_X:g}) = {n['d_w1']:g}", ko),
+        ORANGE, fontsize=10.5)
+    arrow(ax, 8.2, node_y - 0.05, 8.0, grad_y + 1.05, color=ORANGE, width=1.6)
+    arrow(ax, 4.8, node_y - 0.05, 3.4, grad_y + 1.05, color=ORANGE, width=1.6)
+
+    ax.text(0.5, 0.25,
+            L("② 역전파 - 오른쪽에서 왼쪽으로, 뒤에서 받은 값 × 이 칸에서 곱한 수",
+              "2) backward pass - right to left, (value from behind) x (number multiplied here)",
+              ko),
+            fontsize=12.5, color=RED)
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+    return n
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -378,8 +573,25 @@ def main() -> None:
     print(f"  예시 5개의 차이: {np.array2string(diff, precision=1, floatmode='fixed')}")
     print(f"  차이를 제곱해 평균 낸 값(손실): {mse:.2f}")
 
+    rows = figure_cross_entropy(ko, RESULTS_DIR / "fig6-cross-entropy.png")
+    print("저장: results/fig6-cross-entropy.png  (분류의 손실, 교차 엔트로피)")
+    print("  정답 쪽 확률 p    교차 엔트로피 -log(p)    제곱 오차 (1-p)^2")
+    for pi, ce_i, sq_i in rows:
+        print(f"  {pi:>12g}    {ce_i:>20.3f}    {sq_i:>17.3f}")
+
     figure_one_step(ko, RESULTS_DIR / "fig6-2-one-step.png")
     print("저장: results/fig6-2-one-step.png  (경사하강법의 한 걸음)")
+
+    n = figure_backprop(ko, RESULTS_DIR / "fig6-backprop.png")
+    print("저장: results/fig6-backprop.png  (역전파)")
+    print(f"  순전파: x = {BP_X:g}, w1 = {BP_W1:g}, w2 = {BP_W2:g}, 정답 = {BP_TARGET:g}")
+    print(f"          h = {n['h']:g}, y = {n['y']:g}, 손실 = {n['loss']:g}")
+    print(f"  역전파: 손실이 y에 민감한 정도 = {n['d_y']:g}")
+    print(f"          손실이 h에 민감한 정도 = {n['d_h']:g}")
+    print(f"          w2의 기울기 = {n['d_w2']:g}, w1의 기울기 = {n['d_w1']:g}")
+    print(f"  수치 확인: 가중치를 {BP_NUDGE:g} 키웠을 때 (손실 변화 ÷ {BP_NUDGE:g})")
+    print(f"          w1: {n['num_w1']:.3f}  (역전파 값 {n['d_w1']:g})")
+    print(f"          w2: {n['num_w2']:.3f}  (역전파 값 {n['d_w2']:g})")
 
     figure_epoch_batch(ko, RESULTS_DIR / "fig6-3-epoch-batch.png")
     print("저장: results/fig6-3-epoch-batch.png  (epoch와 batch의 관계)")
