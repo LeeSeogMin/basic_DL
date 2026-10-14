@@ -1,5 +1,7 @@
 # 제6장 학습이란 무엇인가 — 손실함수와 경사하강법
 
+https://www.youtube.com/watch?v=aircAruvnKk
+
 ---
 
 ### 학습 목표
