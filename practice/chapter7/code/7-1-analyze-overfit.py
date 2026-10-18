@@ -1,46 +1,47 @@
-"""실습 7.1 - 일부러 과적합을 만든다.
+"""실습 7.1 - 과적합된 모델을 불러와 분석한다.
 
-잡음이 섞인 곡선 데이터를 만들고, 다항식 차수를 1, 4, 15로 올려 세 모델을 맞춘다.
-차수가 높아질수록 곡선이 훈련 데이터의 점에 바싹 달라붙지만, 점과 점 사이에서는
-위아래로 요동친다. 훈련 오차는 내려가고 테스트 오차는 올라간다.
-N_SAMPLES를 차수보다 하나 큰 값(예: 16)으로 줄이면 곡선이 모든 점을 통과한다.
+교수가 미리 만들어 둔 파일(practice/chapter7/data/)을 불러온다.
+  train.csv, test.csv      훈련 데이터 30개, 테스트 데이터 200개
+  model_degree01.joblib    차수 1  다항식 모델
+  model_degree04.joblib    차수 4  다항식 모델
+  model_degree15.joblib    차수 15 다항식 모델
+
+불러온 모델로 훈련 오차와 테스트 오차를 계산하고, 두 오차의 차이와 곡선이 점 사이에서
+어디까지 솟구치는지 확인한다. 차수가 높을수록 훈련 오차는 내려가고 테스트 오차는 올라간다.
 
 주의: 이 데이터는 실제 관측값이 아니라 컴퓨터로 만든 합성 데이터다.
+파일이 없거나 scikit-learn 버전 때문에 모델을 못 불러오면, 7-1-make-overfit-files.py를
+한 번 실행해 파일을 다시 만든다. joblib 파일은 저장소에서 받은 것만 불러온다.
 
 차수 1, 4, 15라는 조합은 scikit-learn 공식 예제 Underfitting vs. Overfitting에서
-쓰는 조합과 같다. 같은 그림을 우리 데이터로 다시 만들어 본다.
+쓰는 조합과 같다.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
+import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 import _krfont
 
 # ---------------------------------------------------------------------------
 # 여기를 바꿔가며 실습한다.
-DEGREES = [1, 4, 15]      # 맞춰 볼 다항식 차수 세 개
-NOISE_LEVEL = 0.25        # 데이터에 섞는 잡음의 크기. 0으로 하면 잡음이 없다
-N_SAMPLES = 30            # 훈련 데이터 점의 개수
+DEGREES = [1, 4, 15]      # 불러올 모델의 차수. 1, 4, 15 중에서 고른다
+X_RANGE = (0.0, 1.0)      # 곡선의 최솟값·최댓값을 확인할 x 구간. 훈련 점은 0과 1 사이에 있다
 # ---------------------------------------------------------------------------
 
-RANDOM_SEED = 42
-N_TEST = 200              # 테스트 데이터 점의 개수(훈련에 쓰지 않는다)
 Y_LIMIT = (-2.2, 2.2)     # 그림의 세로 범위
 
 CHAPTER_DIR = Path(__file__).resolve().parents[1]
+DATA_DIR = CHAPTER_DIR / "data"
 RESULTS_DIR = CHAPTER_DIR / "results"
 
 BLUE = "#4C78A8"
-ORANGE = "#F58518"
 GREEN = "#54A24B"
 RED = "#E45756"
 GRAY = "#79706E"
@@ -51,31 +52,26 @@ def true_function(x: np.ndarray) -> np.ndarray:
     return np.cos(1.5 * np.pi * x)
 
 
-def make_curve_data(n: int, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
-    """진짜 곡선 위에 잡음을 섞어 합성 데이터를 만든다."""
-    x = np.sort(rng.uniform(0.0, 1.0, n))
-    y = true_function(x) + rng.normal(0.0, NOISE_LEVEL, n)
-    return x, y
+def load_files(degrees: list[int]):
+    """훈련·테스트 CSV와 차수별 모델을 불러온다. 없으면 안내 문구와 함께 멈춘다."""
+    needed = [DATA_DIR / "train.csv", DATA_DIR / "test.csv"]
+    needed += [DATA_DIR / f"model_degree{d:02d}.joblib" for d in degrees]
+    missing = [p.name for p in needed if not p.exists()]
+    if missing:
+        raise SystemExit(
+            f"불러올 파일이 없다: {missing}\n"
+            "code 폴더에서 python 7-1-make-overfit-files.py를 한 번 실행해 파일을 만든다."
+        )
 
-
-def fit_polynomial(degree: int, x: np.ndarray, y: np.ndarray):
-    """차수가 degree인 다항식을 데이터에 맞춘다.
-
-    PolynomialFeatures가 x, x^2, ... , x^degree 열을 만들고
-    LinearRegression이 각 열에 붙는 계수를 찾는다.
-    StandardScaler는 높은 차수에서 숫자 크기가 벌어지는 것을 막는다.
-    """
-    model = make_pipeline(
-        PolynomialFeatures(degree=degree, include_bias=False),
-        StandardScaler(),
-        LinearRegression(),
-    )
-    model.fit(x.reshape(-1, 1), y)
-    return model
+    train = pd.read_csv(DATA_DIR / "train.csv")
+    test = pd.read_csv(DATA_DIR / "test.csv")
+    # joblib 파일은 불러올 때 코드를 실행할 수 있다. 저장소에서 받은 파일만 불러온다.
+    models = [joblib.load(DATA_DIR / f"model_degree{d:02d}.joblib") for d in degrees]
+    return train, test, models
 
 
 def rmse(model, x: np.ndarray, y: np.ndarray) -> float:
-    """예측이 정답에서 평균 몇만큼 떨어져 있는지 잰다. 작을수록 잘 맞춘 것이다."""
+    """예측이 정답에서 평균 몇만큼 떨어져 있는지 계산한다. 작을수록 잘 맞춘 것이다."""
     pred = model.predict(x.reshape(-1, 1))
     return float(np.sqrt(mean_squared_error(y, pred)))
 
@@ -156,18 +152,13 @@ def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
 
-    rng = np.random.default_rng(RANDOM_SEED)
-    x_train, y_train = make_curve_data(N_SAMPLES, rng)
-    x_test, y_test = make_curve_data(N_TEST, rng)
+    train, test, models = load_files(DEGREES)
+    x_train, y_train = train["x"].to_numpy(), train["y"].to_numpy()
+    x_test, y_test = test["x"].to_numpy(), test["y"].to_numpy()
 
-    models = []
     scores = []
-    for degree in DEGREES:
-        model = fit_polynomial(degree, x_train, y_train)
-        train_err = rmse(model, x_train, y_train)
-        test_err = rmse(model, x_test, y_test)
-        models.append(model)
-        scores.append((degree, train_err, test_err))
+    for degree, model in zip(DEGREES, models):
+        scores.append((degree, rmse(model, x_train, y_train), rmse(model, x_test, y_test)))
 
     table = pd.DataFrame(
         [
@@ -187,12 +178,12 @@ def main() -> None:
     save_fit_plot(ko, x_train, y_train, models, scores, plot_path)
 
     # ------------------------------------------------------------------
-    print("=== 실습 7.1 일부러 과적합 만들기 ===")
+    print("=== 실습 7.1 과적합된 모델 분석하기 ===")
     _krfont.report(ko)
     print("데이터: 컴퓨터로 만든 합성 데이터(실제 관측값 아님)")
-    print(f"훈련 데이터 {N_SAMPLES}개, 테스트 데이터 {N_TEST}개")
-    print(f"잡음 크기 NOISE_LEVEL = {NOISE_LEVEL}")
-    print(f"맞춰 본 차수: {DEGREES}")
+    print(f"불러온 파일: data/train.csv, data/test.csv, 모델 {len(models)}개 (data/model_degree*.joblib)")
+    print(f"훈련 데이터 {len(x_train)}개, 테스트 데이터 {len(x_test)}개")
+    print(f"불러온 모델의 차수: {DEGREES}")
     print()
 
     print("=== 차수별 오차 (RMSE, 작을수록 잘 맞춘 것) ===")
@@ -201,17 +192,25 @@ def main() -> None:
         print(f"{degree:>4}{train_err:>12.4f}{test_err:>13.4f}{test_err - train_err:>11.4f}")
     print()
 
+    by_train = [row[0] for row in sorted(scores, key=lambda row: row[1])]
+    by_test = [row[0] for row in sorted(scores, key=lambda row: row[2])]
+    print("오차가 작은 차수부터 나열한 순위")
+    print(f"  훈련 오차 순위: {' > '.join(str(d) for d in by_train)}")
+    print(f"  테스트 오차 순위: {' > '.join(str(d) for d in by_test)}")
+    print()
+
     best_degree, _, best_test = min(scores, key=lambda row: row[2])
     print(f"테스트 오차가 가장 작은 차수: {best_degree} (테스트 오차 {best_test:.4f})")
     print()
 
     print("=== 훈련 점에 얼마나 붙었고, 점 사이에서 얼마나 솟구쳤는가 ===")
     print(f"{'차수':>4}{'훈련 점에서 벗어난 최대 거리':>22}{'곡선 최솟값':>12}{'곡선 최댓값':>12}")
-    grid = np.linspace(0.0, 1.0, 400)
+    grid = np.linspace(X_RANGE[0], X_RANGE[1], 400)
     for degree, model in zip(DEGREES, models):
         residual = np.abs(model.predict(x_train.reshape(-1, 1)) - y_train)
         curve = model.predict(grid.reshape(-1, 1))
         print(f"{degree:>4}{residual.max():>22.4f}{curve.min():>12.2f}{curve.max():>12.2f}")
+    print(f"확인한 x 구간: {X_RANGE[0]} 에서 {X_RANGE[1]} 사이")
     print("참고: 진짜 곡선은 -1.00 에서 1.00 사이만 움직인다")
     print()
 
@@ -219,7 +218,7 @@ def main() -> None:
     print(f"비교 그림: results/{plot_path.name}")
     print(f"오차 표: results/{table_path.name}")
     print()
-    print("DEGREES, NOISE_LEVEL, N_SAMPLES를 바꿔 다시 실행하면 그림과 표가 달라진다.")
+    print("DEGREES와 X_RANGE를 바꿔 다시 실행하면 그림과 표가 달라진다.")
 
 
 if __name__ == "__main__":
