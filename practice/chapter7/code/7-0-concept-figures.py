@@ -1,9 +1,10 @@
 """7장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 세 장이다.
+만드는 그림은 네 장이다.
   fig7-1  과소적합 · 알맞음 · 과적합 세 가지를 나란히 놓은 도식
   fig7-2  복잡도를 올릴 때 훈련 오차와 검증 오차가 벌어지는 지점
   fig7-3  훈련 · 검증 · 테스트 세 갈래 분할(4장의 2분할을 셋으로 넓힌다)
+  fig7-4  5조각 교차검증(검증 조각을 바꿔 가며 5번 학습한다)
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다. 그림에 쓰는 점과 곡선은
 컴퓨터로 만든 합성 데이터이며, 실제 관측값이 아니다.
@@ -318,6 +319,66 @@ def figure_three_way_split(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------
+# 그림 7-4: 5조각 교차검증
+# ---------------------------------------------------------------------------
+
+def figure_cross_validation(ko: bool, out_path: Path) -> None:
+    """데이터를 5조각으로 나누고 검증 조각을 바꿔 가며 5번 학습하는 과정을 그린다."""
+    L = _krfont.label
+    n_fold = 5
+    fig, ax = plt.subplots(figsize=(10.0, 6.0))
+    blank_axes(ax, xlim=(0, 10.4), ylim=(0, 9))
+
+    ax.set_title(
+        L("검증 조각을 바꿔 가며 5번 학습한다 (5조각 교차검증)",
+          "Rotate the validation piece and train five times (5-fold cross-validation)", ko),
+        fontsize=14, pad=12, loc="left",
+    )
+
+    x0, cell_w, gap = 1.3, 1.3, 0.08
+    row_h, row_step, top = 0.78, 1.0, 6.5
+
+    # 조각 번호
+    for j in range(n_fold):
+        ax.text(x0 + j * cell_w + cell_w / 2, top + row_h + 0.35,
+                L(f"조각 {j + 1}", f"piece {j + 1}", ko),
+                ha="center", fontsize=11, color="#333333")
+    ax.text(8.85, top + row_h + 0.35, L("검증 점수", "val. score", ko),
+            ha="center", fontsize=11, color="#333333")
+
+    for i in range(n_fold):
+        y = top - i * row_step
+        ax.text(0.15, y + row_h / 2, L(f"{i + 1}회차", f"round {i + 1}", ko),
+                ha="left", va="center", fontsize=11.5, color="#333333")
+        for j in range(n_fold):
+            is_val = (i == j)
+            box(ax, x0 + j * cell_w + gap, y, cell_w - 2 * gap, row_h,
+                L("검증", "valid", ko) if is_val else L("학습", "train", ko),
+                ORANGE if is_val else BLUE, 10.5)
+        arrow(ax, x0 + n_fold * cell_w + 0.1, y + row_h / 2,
+              x0 + n_fold * cell_w + 0.55, y + row_h / 2)
+        box(ax, 8.2, y, 1.3, row_h, L(f"점수 {i + 1}", f"score {i + 1}", ko), GREEN, 10.5)
+
+    # 평균
+    y_last = top - (n_fold - 1) * row_step
+    arrow(ax, 8.85, y_last - 0.12, 8.85, y_last - 0.7)
+    box(ax, 7.6, y_last - 1.65, 2.5, 0.9,
+        L("5개 점수의 평균", "mean of the 5 scores", ko), GREEN, 11)
+
+    # 범례
+    box(ax, 1.3, 1.2, 0.5, 0.4, "", BLUE)
+    ax.text(1.95, 1.4, L("학습에 쓰는 조각 (4개, 80%)", "used for training (4 pieces)", ko),
+            va="center", fontsize=10.5, color="#333333")
+    box(ax, 1.3, 0.55, 0.5, 0.4, "", ORANGE)
+    ax.text(1.95, 0.75, L("검증에 쓰는 조각 (1개, 20%)", "used for validation (1 piece)", ko),
+            va="center", fontsize=10.5, color="#333333")
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -332,6 +393,8 @@ def main() -> None:
          "훈련 오차와 검증 오차가 벌어지는 지점"),
         ("fig7-3-three-way-split.png", figure_three_way_split,
          "훈련 · 검증 · 테스트 세 갈래 분할"),
+        ("fig7-4-cross-validation.png", figure_cross_validation,
+         "5조각 교차검증"),
     ]
 
     for filename, builder, description in targets:
