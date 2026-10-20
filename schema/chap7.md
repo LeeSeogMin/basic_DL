@@ -52,9 +52,10 @@
 - 학생 조작 지점: `MAX_DEGREE`, `FIT_SIZE`, `LEARNING_DEGREE`, `NOISE_LEVEL`, `N_REPEATS`
 - 진단 1(복잡도 곡선): 차수를 1부터 10까지 올리며 훈련·검증 오차를 나란히 그린다
 - 진단 2(학습 곡선): 차수를 10으로 고정하고 훈련 데이터를 20개부터 300개까지 늘린다
+- 진단 3(결합 처방 곡선): 진단 2에서 사용한 가장 큰 훈련 데이터 수(현재 300개)를 자동으로 골라 차수를 1부터 10까지 다시 비교한다
 - 측정 방법: 같은 크기의 훈련 데이터를 최대 9번 다르게 뽑아 오차의 **중앙값**을 쓴다. 한 번만 뽑으면 어느 점이 뽑혔는지에 따라 값이 들쭉날쭉해 두 곡선의 관계가 안 보인다
 - 교훈 지점: 두 처방(모델 줄이기·데이터 늘리기)이 각각 어느 그림에 대응하는지 확인하고, 마지막에 테스트 데이터를 딱 한 번 쓴다
-- 산출물: `results/diagnose_curves.png`, `results/complexity_curve.csv`, `results/learning_curve.csv`
+- 산출물: `results/diagnose_curves.png`, `results/complexity_curve.csv`, `results/learning_curve.csv`, `results/combined_complexity_curve.csv`
 
 ### 개념 그림 생성
 

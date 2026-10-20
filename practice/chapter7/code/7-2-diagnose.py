@@ -1,16 +1,18 @@
 """실습 7.2 - 과적합을 진단하고 고친다.
 
-두 장의 그림을 그린다.
+세 장의 그림을 그린다.
 
   왼쪽 그림(복잡도 곡선): 가로축에 모델 복잡도(다항식 차수)를 놓고
       훈련 오차와 검증 오차를 함께 그린다. 두 곡선이 벌어지기 시작하는 지점이
       과적합이 시작되는 지점이다.
-  오른쪽 그림(학습 곡선): 복잡한 모델을 그대로 두고 훈련 데이터만 늘리면서
+  가운데 그림(학습 곡선): 복잡한 모델을 그대로 두고 훈련 데이터만 늘리면서
       두 곡선의 간격이 어떻게 달라지는지 그린다.
+  마지막 그림(두 처방 결합): 훈련 데이터를 늘린 상태에서 차수를 다시 비교해
+      두 처방을 함께 적용했을 때의 검증 오차가 가장 낮은 차수를 찾는다.
 
-두 그림은 두 가지 처방에 각각 대응한다.
+세 그림은 두 가지 처방을 따로 적용한 결과와 함께 적용한 결과에 대응한다.
   모델을 단순하게 한다 -> 왼쪽 그림에서 검증 오차가 가장 낮은 차수로 내려온다
-  데이터를 늘린다      -> 오른쪽 그림에서 두 곡선의 간격이 좁아진다
+  데이터를 늘린다      -> 가운데 그림에서 두 곡선의 간격이 좁아진다
 
 훈련 데이터를 한 번만 뽑으면 어느 점이 뽑혔는지에 따라 오차가 들쭉날쭉하다.
 그래서 같은 크기의 훈련 데이터를 N_REPEATS번 다르게 뽑아 재고, 그중 가운데
@@ -40,20 +42,16 @@ import _krfont
 # 여기를 바꿔가며 실습한다.
 MAX_DEGREE = 10          # 왼쪽 그림에서 차수를 1부터 여기까지 올린다
 FIT_SIZE = 25            # 왼쪽 그림에서 쓰는 훈련 데이터 개수
-LEARNING_DEGREE = 10     # 오른쪽 그림에서 고정해 두는 차수(복잡한 모델)
+LEARNING_DEGREE = 10     # 가운데 그림에서 고정해 두는 차수(복잡한 모델)
 NOISE_LEVEL = 0.25       # 데이터에 섞는 잡음의 크기
 N_REPEATS = 9            # 같은 크기로 훈련 데이터를 몇 번 다르게 뽑아 볼 것인가
-
-# 마지막에 테스트할 차수를 사람이 직접 정하고 싶을 때 숫자를 넣는다.
-# None 이면 검증 오차가 가장 낮은 차수를 코드가 고른다.
-# 검증 오차가 비슷한 차수가 여럿이면, 더 단순한 쪽을 직접 넣어 비교해 볼 수 있다.
-FINAL_DEGREE = None
 # ---------------------------------------------------------------------------
 
 RANDOM_SEED = 42
 N_TOTAL = 1000           # 만들어 둘 전체 데이터 개수
 N_POOL = 700             # 훈련 후보
 N_VAL = 200              # 검증
+# 진단 3은 아래 목록에서 가장 큰 데이터 개수를 자동으로 사용한다.
 LEARNING_SIZES = [20, 25, 30, 40, 60, 90, 140, 200, 300]
 Y_TOP = 1.05             # 그림의 세로 상한
 
@@ -123,12 +121,13 @@ def measure(
 def complexity_curve(
     x_pool: np.ndarray, y_pool: np.ndarray,
     x_val: np.ndarray, y_val: np.ndarray,
+    size: int = FIT_SIZE,
 ) -> pd.DataFrame:
-    """차수를 1부터 MAX_DEGREE까지 올리며 훈련·검증 오차를 잰다."""
+    """훈련 데이터 수를 고정하고 차수별 훈련·검증 오차를 잰다."""
     rows = []
     for degree in range(1, MAX_DEGREE + 1):
         train_err, val_err, repeats = measure(
-            degree, FIT_SIZE, x_pool, y_pool, x_val, y_val
+            degree, size, x_pool, y_pool, x_val, y_val
         )
         rows.append({
             "차수": degree,
@@ -166,11 +165,14 @@ def save_diagnose_plot(
     ko: bool,
     complexity: pd.DataFrame,
     learning: pd.DataFrame,
-    best_degree: int,
+    combined: pd.DataFrame,
+    simple_degree: int,
+    combined_degree: int,
+    combined_size: int,
     out_path: Path,
 ) -> None:
     L = _krfont.label
-    fig, axes = plt.subplots(1, 2, figsize=(13.0, 5.6))
+    fig, axes = plt.subplots(1, 3, figsize=(18.0, 5.6))
 
     # --- 왼쪽: 복잡도에 따른 두 곡선 ---
     ax = axes[0]
@@ -189,11 +191,11 @@ def save_diagnose_plot(
         complexity["훈련오차"], complexity["검증오차"],
         color=RED, alpha=0.12,
     )
-    ax.axvline(best_degree, color=GREEN, linestyle="--", linewidth=2.0)
+    ax.axvline(simple_degree, color=GREEN, linestyle="--", linewidth=2.0)
     ax.text(
-        best_degree + 0.2, Y_TOP * 0.92,
-        L(f"검증 오차가 가장 낮은 차수 {best_degree}",
-          f"best degree {best_degree}", ko),
+        simple_degree + 0.2, Y_TOP * 0.92,
+        L(f"검증 오차가 가장 낮은 차수 {simple_degree}",
+          f"best degree {simple_degree}", ko),
         color=GREEN, fontsize=11,
     )
     ax.set_xlim(0.5, MAX_DEGREE + 0.5)
@@ -204,6 +206,45 @@ def save_diagnose_plot(
     ax.set_title(
         L(f"복잡도를 올릴 때 (훈련 데이터 {FIT_SIZE}개)",
           f"raising complexity (train n={FIT_SIZE})", ko),
+        fontsize=13, pad=10,
+    )
+    ax.grid(alpha=0.25)
+    ax.legend(
+        loc="upper center", bbox_to_anchor=(0.5, -0.14),
+        ncol=2, fontsize=11, frameon=False,
+    )
+
+    # --- 마지막: 데이터를 늘린 뒤 차수를 다시 비교할 때 ---
+    ax = axes[2]
+    ax.plot(
+        combined["차수"], combined["훈련오차"],
+        marker="o", color=BLUE, linewidth=2.4,
+        label=L("훈련 오차", "training error", ko),
+    )
+    ax.plot(
+        combined["차수"], combined["검증오차"],
+        marker="s", color=ORANGE, linewidth=2.4,
+        label=L("검증 오차", "validation error", ko),
+    )
+    ax.fill_between(
+        combined["차수"], combined["훈련오차"], combined["검증오차"],
+        color=RED, alpha=0.12,
+    )
+    ax.axvline(combined_degree, color=GREEN, linestyle="--", linewidth=2.0)
+    ax.text(
+        combined_degree + 0.2, Y_TOP * 0.92,
+        L(f"검증 오차가 가장 낮은 차수 {combined_degree}",
+          f"best degree {combined_degree}", ko),
+        color=GREEN, fontsize=11,
+    )
+    ax.set_xlim(0.5, MAX_DEGREE + 0.5)
+    ax.set_ylim(0.0, Y_TOP)
+    ax.set_xticks(list(combined["차수"]))
+    ax.set_xlabel(L("모델 복잡도(다항식 차수)", "model complexity (degree)", ko), fontsize=12)
+    ax.set_ylabel(L("오차(RMSE)", "error (RMSE)", ko), fontsize=12)
+    ax.set_title(
+        L(f"두 처방을 함께 적용 (훈련 데이터 {combined_size}개)",
+          f"both remedies (train n={combined_size})", ko),
         fontsize=13, pad=10,
     )
     ax.grid(alpha=0.25)
@@ -280,20 +321,26 @@ def main() -> None:
     x_val, y_val = x_all[N_POOL:N_POOL + N_VAL], y_all[N_POOL:N_POOL + N_VAL]
     x_test, y_test = x_all[N_POOL + N_VAL:], y_all[N_POOL + N_VAL:]
 
+    if not LEARNING_SIZES:
+        raise ValueError("LEARNING_SIZES에는 훈련 데이터 개수가 하나 이상 있어야 한다")
+    invalid_sizes = [size for size in LEARNING_SIZES if not 1 <= size <= len(x_pool)]
+    if invalid_sizes:
+        raise ValueError(
+            f"LEARNING_SIZES의 값은 1 이상 {len(x_pool)} 이하여야 한다: "
+            f"{invalid_sizes}"
+        )
+    combined_size = max(LEARNING_SIZES)
+
     complexity = complexity_curve(x_pool, y_pool, x_val, y_val)
     learning = learning_curve(x_pool, y_pool, x_val, y_val)
+    combined = complexity_curve(
+        x_pool, y_pool, x_val, y_val, size=combined_size
+    )
 
-    lowest_row = complexity.loc[complexity["검증오차"].idxmin()]
-    lowest_degree = int(lowest_row["차수"])
-
-    if FINAL_DEGREE is None:
-        best_degree = lowest_degree
-        chosen_by = "검증 오차가 가장 낮은 차수를 코드가 골랐다"
-    else:
-        best_degree = int(FINAL_DEGREE)
-        chosen_by = f"FINAL_DEGREE={FINAL_DEGREE} 로 사람이 직접 정했다"
-
-    best_row = complexity.loc[complexity["차수"] == best_degree].iloc[0]
+    simple_row = complexity.loc[complexity["검증오차"].idxmin()]
+    simple_degree = int(simple_row["차수"])
+    combined_row = combined.loc[combined["검증오차"].idxmin()]
+    combined_degree = int(combined_row["차수"])
 
     complexity.round(4).to_csv(
         RESULTS_DIR / "complexity_curve.csv", index=False, encoding="utf-8-sig"
@@ -301,9 +348,17 @@ def main() -> None:
     learning.round(4).to_csv(
         RESULTS_DIR / "learning_curve.csv", index=False, encoding="utf-8-sig"
     )
+    combined.round(4).to_csv(
+        RESULTS_DIR / "combined_complexity_curve.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
 
     plot_path = RESULTS_DIR / "diagnose_curves.png"
-    save_diagnose_plot(ko, complexity, learning, best_degree, plot_path)
+    save_diagnose_plot(
+        ko, complexity, learning, combined,
+        simple_degree, combined_degree, combined_size, plot_path,
+    )
 
     # ------------------------------------------------------------------
     print("=== 실습 7.2 과적합 진단하고 고치기 ===")
@@ -318,12 +373,12 @@ def main() -> None:
         f"진단 1. 복잡도를 올릴 때 (훈련 데이터 {FIT_SIZE}개 고정)",
         complexity, "차수",
     )
-    print(f"검증 오차가 가장 낮은 차수: {best_degree} (검증 오차 {best_row['검증오차']:.4f})")
+    print(f"검증 오차가 가장 낮은 차수: {simple_degree} (검증 오차 {simple_row['검증오차']:.4f})")
     first_gap = complexity.loc[complexity["차수"] == 1, "간격"].iloc[0]
-    best_gap = float(best_row["간격"])
+    simple_gap = float(simple_row["간격"])
     last_gap = complexity.loc[complexity["차수"] == MAX_DEGREE, "간격"].iloc[0]
     print(f"차수 1에서 두 곡선의 간격: {first_gap:.4f}")
-    print(f"차수 {best_degree}에서 두 곡선의 간격: {best_gap:.4f}")
+    print(f"차수 {simple_degree}에서 두 곡선의 간격: {simple_gap:.4f}")
     print(f"차수 {MAX_DEGREE}에서 두 곡선의 간격: {last_gap:.4f}")
     print()
 
@@ -337,27 +392,44 @@ def main() -> None:
     print(f"훈련 {int(large['훈련데이터수'])}개일 때 간격: {large['간격']:.4f}")
     print()
 
+    print_table(
+        f"진단 3. 두 처방을 함께 적용할 때 (훈련 데이터 {combined_size}개 고정)",
+        combined, "차수",
+    )
+    print(
+        f"두 처방을 함께 적용했을 때 검증 오차가 가장 낮은 차수: "
+        f"{combined_degree} (검증 오차 {combined_row['검증오차']:.4f})"
+    )
+    print()
+
     # ------------------------------------------------------------------
-    # 처방 표는 위의 두 표에서 값을 그대로 꺼내 온다. 따로 다시 재지 않는다.
-    print("=== 처방 두 개를 적용한 결과 ===")
+    # 처방 표는 위의 세 진단표에서 값을 그대로 꺼내 온다. 따로 다시 재지 않는다.
+    print("=== 두 처방을 따로, 함께 적용한 결과 ===")
     none_row = complexity.loc[complexity["차수"] == LEARNING_DEGREE].iloc[0]
-    simple_row = complexity.loc[complexity["차수"] == best_degree].iloc[0]
     more_row = learning.iloc[-1]
 
     print(f"{'처방':<30}{'훈련오차':>10}{'검증오차':>10}{'간격':>10}")
     for name, row in [
         (f"없음(차수 {LEARNING_DEGREE}, 데이터 {FIT_SIZE}개)", none_row),
-        (f"모델을 단순하게(차수 {best_degree}, 데이터 {FIT_SIZE}개)", simple_row),
+        (f"모델을 단순하게(차수 {simple_degree}, 데이터 {FIT_SIZE}개)", simple_row),
         (f"데이터를 늘림(차수 {LEARNING_DEGREE}, {int(more_row['훈련데이터수'])}개)", more_row),
+        (f"둘 다(차수 {combined_degree}, {combined_size}개)", combined_row),
     ]:
         print(f"{name:<30}{row['훈련오차']:>10.4f}{row['검증오차']:>10.4f}{row['간격']:>10.4f}")
+    print(
+        f"둘 다 적용: 서로 겹치지 않는 표본 {combined_size}개 묶음 "
+        f"{int(combined_row['뽑은횟수'])}회 측정"
+    )
     print()
 
     # ------------------------------------------------------------------
     print("=== 마지막에 한 번만 쓰는 테스트 데이터 ===")
-    final_model = fit_polynomial(best_degree, x_pool, y_pool)
-    print(f"고른 모델: 차수 {best_degree}, 훈련 후보 {len(x_pool)}개 전부로 다시 학습")
-    print(f"고른 방법: {chosen_by}")
+    final_model = fit_polynomial(combined_degree, x_pool, y_pool)
+    print(f"고른 모델: 차수 {combined_degree}, 훈련 후보 {len(x_pool)}개 전부로 다시 학습")
+    print(
+        f"고른 방법: 진단 3에서 검증 오차가 가장 낮은 차수 "
+        f"{combined_degree}를 코드가 자동으로 골랐다"
+    )
     print(f"검증 오차: {rmse(final_model, x_val, y_val):.4f}")
     print(f"테스트 오차: {rmse(final_model, x_test, y_test):.4f}")
     print("검증 데이터로 차수를 골랐으므로, 최종 성적은 테스트 데이터에서 잰다.")
@@ -367,6 +439,7 @@ def main() -> None:
     print(f"진단 그림: results/{plot_path.name}")
     print("복잡도 표: results/complexity_curve.csv")
     print("학습 곡선 표: results/learning_curve.csv")
+    print("결합 처방 표: results/combined_complexity_curve.csv")
     print()
     print("MAX_DEGREE, FIT_SIZE, LEARNING_DEGREE, NOISE_LEVEL, N_REPEATS를 바꿔 다시 실행한다.")
 
