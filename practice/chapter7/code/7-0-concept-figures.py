@@ -1,11 +1,12 @@
 """7장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 다섯 장이다.
+만드는 그림은 여섯 장이다.
   fig7-1  과소적합 · 알맞음 · 과적합 세 가지를 나란히 놓은 도식
   fig7-2  복잡도를 올릴 때 훈련 오차와 검증 오차가 벌어지는 지점
   fig7-3  훈련 · 검증 · 테스트 세 갈래 분할(4장의 2분할을 셋으로 넓힌다)
   fig7-4  5조각 교차검증(검증 조각을 바꿔 가며 5번 학습한다)
   fig7-5  드롭아웃(학습 회차마다 다른 뉴런을 쉬게 하고 예측할 때 모두 쓴다)
+  fig7-6  4장 결정 트리의 깊이별 모양과 훈련·테스트 정확도
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다. 그림에 쓰는 점과 곡선은
 컴퓨터로 만든 합성 데이터이며, 실제 관측값이 아니다.
@@ -481,6 +482,151 @@ def figure_dropout(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------
+# 그림 7-6: 4장 결정 트리의 깊이별 모양과 성적
+# ---------------------------------------------------------------------------
+
+# 실습 4.1 로그(practice/chapter4/results/4-1-simple-classifier.log)의 표
+TREE_DEPTH_SCORES = [
+    ("1", 0.866, 0.854),
+    ("2", 0.866, 0.854),
+    ("3", 0.938, 0.938),
+    ("제한 없음", 1.000, 0.917),
+]
+
+# 잎은 "N"(미통과) 또는 "P"(통과), 갈라지는 마디는 (왼쪽, 오른쪽).
+# 깊이 2의 잎 4개와 깊이 3의 잎 6개는 로그의 규칙 출력에서 가져왔다.
+# 깊이 1의 잎 색은 깊이 2 설명(왼쪽 미통과, 오른쪽 통과)과 일치시켰다.
+TREE_SHAPES = [
+    ("N", "P"),
+    (("N", "N"), ("P", "P")),
+    (("N", ("N", "P")), (("P", "N"), "P")),
+]
+
+
+def _leaf_count(node) -> int:
+    return 1 if isinstance(node, str) else sum(_leaf_count(c) for c in node)
+
+
+def _draw_tree(ax, node, x0, width, y0, dy, leaf_r, colors=None):
+    """이진 트리를 x0에서 x0+width 사이에 그린다. 마디의 x는 두 자식의 가운데다."""
+    def place(n, left, right, depth):
+        if isinstance(n, str):
+            return (left + right) / 2, [(n, (left + right) / 2, y0 - depth * dy)]
+        count = _leaf_count(n[0]) + _leaf_count(n[1])
+        mid = left + (right - left) * _leaf_count(n[0]) / count
+        lx, lleaves = place(n[0], left, mid, depth + 1)
+        rx, rleaves = place(n[1], mid, right, depth + 1)
+        x = (lx + rx) / 2
+        y = y0 - depth * dy
+        for cx in (lx, rx):
+            ax.plot([x, cx], [y, y - dy], color=GRAY, linewidth=1.2, zorder=1)
+        return x, lleaves + rleaves
+
+    x, leaves = place(node, x0, x0 + width, 0)
+    ax.scatter([x], [y0], s=70, color=GRAY, zorder=3)
+
+    def internal(n, left, right, depth):
+        if isinstance(n, str):
+            return
+        count = _leaf_count(n[0]) + _leaf_count(n[1])
+        mid = left + (right - left) * _leaf_count(n[0]) / count
+        if depth > 0:
+            nx = (place_x(n[0], left, mid) + place_x(n[1], mid, right)) / 2
+            ax.scatter([nx], [y0 - depth * dy], s=70, color=GRAY, zorder=3)
+        internal(n[0], left, mid, depth + 1)
+        internal(n[1], mid, right, depth + 1)
+
+    def place_x(n, left, right):
+        if isinstance(n, str):
+            return (left + right) / 2
+        count = _leaf_count(n[0]) + _leaf_count(n[1])
+        mid = left + (right - left) * _leaf_count(n[0]) / count
+        return (place_x(n[0], left, mid) + place_x(n[1], mid, right)) / 2
+
+    internal(node, x0, x0 + width, 0)
+    for label, lx, ly in leaves:
+        color = (colors or {"N": RED, "P": BLUE})[label]
+        ax.scatter([lx], [ly], s=leaf_r, color=color, zorder=3)
+
+
+def figure_tree_depth(ko: bool, out_path: Path) -> None:
+    """깊이가 늘 때 트리의 모양과 훈련·테스트 정확도가 어떻게 달라지는지 그린다."""
+    L = _krfont.label
+    fig, (ax_tree, ax_line) = plt.subplots(
+        1, 2, figsize=(13.5, 5.6), gridspec_kw={"width_ratios": [1.15, 1]}
+    )
+
+    # 왼쪽: 트리 모양 네 개 (2 x 2)
+    blank_axes(ax_tree, xlim=(0, 10), ylim=(-1.3, 10))
+    ax_tree.set_title(L("깊이가 늘면 트리가 잘게 갈라진다",
+                        "The tree splits finer as depth grows", ko),
+                      fontsize=13, pad=10)
+    cells = [
+        (0.2, 9.2, TREE_SHAPES[0], L("깊이 1 (잎 2개)", "depth 1 (2 leaves)", ko)),
+        (5.2, 9.2, TREE_SHAPES[1], L("깊이 2 (잎 4개)", "depth 2 (4 leaves)", ko)),
+        (0.2, 5.0, TREE_SHAPES[2], L("깊이 3 (잎 6개)", "depth 3 (6 leaves)", ko)),
+    ]
+    for x0, y0, shape, caption in cells:
+        _draw_tree(ax_tree, shape, x0 + 0.3, 4.0, y0 - 0.5, 1.15, 160)
+        depth = 3 if shape is TREE_SHAPES[2] else (2 if shape is TREE_SHAPES[1] else 1)
+        ax_tree.text(x0 + 2.3, y0 - 0.5 - depth * 1.15 - 0.8,
+                     caption, ha="center", fontsize=11, color="#333333")
+
+    # 제한 없음: 잎이 훈련 학생 한 명씩에 가깝게 쪼개진 모양(개념 도식, 잎 수는 로그에 없음)
+    def full(depth):
+        return "G" if depth == 0 else (full(depth - 1), full(depth - 1))
+
+    _draw_tree(ax_tree, full(4), 5.5, 4.0, 5.0 - 0.5, 0.86, 50,
+               colors={"G": GRAY})
+    ax_tree.text(7.5, 0.0,
+                 L("제한 없음 (잎 수는 로그에 없음, 개념 도식)",
+                   "no limit (leaf count not logged, schematic)", ko),
+                 ha="center", fontsize=10.5, color="#333333")
+    ax_tree.scatter([], [], color=RED, label=L("미통과", "fail", ko))
+    ax_tree.scatter([], [], color=BLUE, label=L("통과", "pass", ko))
+    ax_tree.legend(loc="lower center", bbox_to_anchor=(0.5, -0.04), ncol=2,
+                   fontsize=10, frameon=False)
+
+    # 오른쪽: 표 7.6 값
+    xs = np.arange(len(TREE_DEPTH_SCORES))
+    train = [s[1] for s in TREE_DEPTH_SCORES]
+    test = [s[2] for s in TREE_DEPTH_SCORES]
+    ax_line.plot(xs, train, marker="o", color=BLUE, linewidth=2.2,
+                 label=L("훈련 정확도", "train accuracy", ko))
+    ax_line.plot(xs, test, marker="s", color=ORANGE, linewidth=2.2,
+                 label=L("테스트 정확도", "test accuracy", ko))
+    ax_line.fill_between(xs[2:], test[2:], train[2:], color=RED, alpha=0.22,
+                         linewidth=0)
+    for x, tr, te in zip(xs, train, test):
+        ax_line.annotate(f"{tr:.3f}", (x, tr), textcoords="offset points",
+                         xytext=(-14 if x == 2 else 0, 9), ha="center",
+                         fontsize=10, color=BLUE)
+        ax_line.annotate(f"{te:.3f}", (x, te), textcoords="offset points",
+                         xytext=(16 if x == 2 else 0, -17), ha="center",
+                         fontsize=10, color=ORANGE)
+    ax_line.annotate(
+        L("제한을 풀면 두 성적이 갈라진다", "limit removed: the scores split", ko),
+        (2.5, 0.96), xytext=(1.0, 0.985), fontsize=10.5, color=RED,
+        arrowprops=dict(arrowstyle="->", color=RED), ha="center",
+    )
+    ax_line.set_xticks(xs)
+    ax_line.set_xticklabels([L(s[0], s[0] if s[0] != "제한 없음" else "no limit", ko)
+                             for s in TREE_DEPTH_SCORES], fontsize=11)
+    ax_line.set_xlabel(L("트리 깊이", "tree depth", ko), fontsize=11)
+    ax_line.set_ylabel(L("정확도", "accuracy", ko), fontsize=11)
+    ax_line.set_ylim(0.82, 1.03)
+    ax_line.grid(alpha=0.25)
+    ax_line.legend(loc="lower right", fontsize=10.5)
+    ax_line.set_title(L("깊이별 훈련·테스트 정확도 (표 7.6)",
+                        "Train/test accuracy by depth (Table 7.6)", ko),
+                      fontsize=13, pad=10)
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -499,6 +645,8 @@ def main() -> None:
          "5조각 교차검증"),
         ("fig7-5-dropout.png", figure_dropout,
          "학습 회차와 예측 단계의 드롭아웃"),
+        ("fig7-6-tree-depth.png", figure_tree_depth,
+         "4장 결정 트리의 깊이별 모양과 성적"),
     ]
 
     for filename, builder, description in targets:
