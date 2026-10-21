@@ -27,7 +27,7 @@
 | 2 | 과적합은 어떻게 알아채는가 | 훈련 성능 하나로는 못 잰다, 두 곡선의 간격 | 그림 7.2 벌어지는 지점 |
 | 3 | 검증 데이터가 필요한 이유 | 테스트로 모델을 고르면 테스트가 훈련이 된다, 3분할 | 그림 7.3 3분할 |
 | 4 | 모델 복잡도 | 복잡도의 손잡이(차수·층·뉴런), 복잡할수록 좋지 않다 | 표 7.1 |
-| 5 | 과적합을 고치는 네 가지 방법 | 데이터 늘리기 / 모델 줄이기 / 정규화 / dropout의 직관 | 표 7.2 |
+| 5 | 과적합을 고치는 네 가지 방법 | 데이터 늘리기 / 모델 줄이기 / 정규화 / dropout의 직관 | 표 7.2, 그림 7.7 드롭아웃 |
 | 6 | 4장의 뒤집힘을 다시 읽는다 | 실습 4.1의 0.902→0.896 대 0.893→0.938 해석 | 표 7.3 |
 | 7 | 직접 움직여 보는 웹 자료 | 외부 시각 자료 4건 | 링크 표 |
 
@@ -60,7 +60,7 @@
 ### 개념 그림 생성
 
 - 파일: `practice/chapter7/code/7-0-concept-figures.py`
-- 산출물: `results/fig7-1-three-fits.png`, `results/fig7-2-generalization-gap.png`, `results/fig7-3-three-way-split.png`
+- 산출물: `results/fig7-1-three-fits.png`, `results/fig7-2-generalization-gap.png`, `results/fig7-3-three-way-split.png`, `results/fig7-4-cross-validation.png`, `results/fig7-5-dropout.png`
 - 한글 폰트 도우미: `practice/chapter7/code/_krfont.py` (4장 파일과 동일. 폰트가 없으면 영어 라벨로 자동 전환)
 
 ## 5. 실행 증거

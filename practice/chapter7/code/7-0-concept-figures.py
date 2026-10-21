@@ -1,10 +1,11 @@
 """7장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 네 장이다.
+만드는 그림은 다섯 장이다.
   fig7-1  과소적합 · 알맞음 · 과적합 세 가지를 나란히 놓은 도식
   fig7-2  복잡도를 올릴 때 훈련 오차와 검증 오차가 벌어지는 지점
   fig7-3  훈련 · 검증 · 테스트 세 갈래 분할(4장의 2분할을 셋으로 넓힌다)
   fig7-4  5조각 교차검증(검증 조각을 바꿔 가며 5번 학습한다)
+  fig7-5  드롭아웃(학습 회차마다 다른 뉴런을 쉬게 하고 예측할 때 모두 쓴다)
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다. 그림에 쓰는 점과 곡선은
 컴퓨터로 만든 합성 데이터이며, 실제 관측값이 아니다.
@@ -379,6 +380,107 @@ def figure_cross_validation(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------
+# 그림 7-5: 드롭아웃
+# ---------------------------------------------------------------------------
+
+def figure_dropout(ko: bool, out_path: Path) -> None:
+    """학습 회차마다 쉬는 뉴런이 달라지고 예측할 때 모두 쓰는 모습을 그린다."""
+    L = _krfont.label
+    layer_x = [0.0, 1.25, 2.5, 3.75]
+    layer_counts = [3, 4, 4, 2]
+    layer_names = [
+        L("입력", "input", ko),
+        L("은닉층 1", "hidden 1", ko),
+        L("은닉층 2", "hidden 2", ko),
+        L("출력", "output", ko),
+    ]
+    panels = [
+        (
+            {(1, 1), (2, 3)},
+            L("학습 1회차", "training step 1", ko),
+            L("회색 X 뉴런은 이번 회차에 쉰다", "gray X neurons rest in this step", ko),
+        ),
+        (
+            {(1, 3), (2, 0)},
+            L("다음 학습 회차", "next training step", ko),
+            L("다른 뉴런을 무작위로 쉰다", "a different random set rests", ko),
+        ),
+        (
+            set(),
+            L("예측할 때", "during prediction", ko),
+            L("모든 뉴런을 사용한다", "all neurons are active", ko),
+        ),
+    ]
+
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.2))
+
+    for ax, (dropped, title, note) in zip(axes, panels):
+        blank_axes(ax, xlim=(-0.45, 4.2), ylim=(0.0, 5.2))
+        positions = {}
+        for layer, (x, count) in enumerate(zip(layer_x, layer_counts)):
+            for node, y in enumerate(np.linspace(1.15, 4.05, count)):
+                positions[(layer, node)] = (x, float(y))
+
+        for layer in range(len(layer_counts) - 1):
+            for left in range(layer_counts[layer]):
+                for right in range(layer_counts[layer + 1]):
+                    start = (layer, left)
+                    end = (layer + 1, right)
+                    inactive = start in dropped or end in dropped
+                    x1, y1 = positions[start]
+                    x2, y2 = positions[end]
+                    ax.plot(
+                        [x1, x2], [y1, y2],
+                        color="#D5D5D5" if inactive else GRAY,
+                        linewidth=0.8 if inactive else 1.0,
+                        linestyle=":" if inactive else "-",
+                        alpha=0.45,
+                        zorder=1,
+                    )
+
+        for layer, count in enumerate(layer_counts):
+            for node in range(count):
+                key = (layer, node)
+                x, y = positions[key]
+                if key in dropped:
+                    ax.scatter(
+                        [x], [y], s=410, facecolor="#F1F1F1",
+                        edgecolor="#B8B8B8", linewidth=1.8, zorder=3,
+                    )
+                    ax.scatter(
+                        [x], [y], s=150, marker="x", color=RED,
+                        linewidth=2.2, zorder=4,
+                    )
+                else:
+                    color = ORANGE if layer == len(layer_counts) - 1 else BLUE
+                    ax.scatter(
+                        [x], [y], s=410, facecolor=color,
+                        edgecolor="white", linewidth=1.8, zorder=3,
+                    )
+
+        for x, name in zip(layer_x, layer_names):
+            ax.text(x, 0.58, name, ha="center", fontsize=10.5, color="#333333")
+
+        ax.set_title(title, fontsize=14, pad=10)
+        ax.text(1.88, 4.72, note, ha="center", fontsize=10.5, color="#333333")
+
+    fig.suptitle(
+        L("학습할 때만 뉴런 일부를 쉬게 한다 (드롭아웃 개념 도식)",
+          "Only training drops neurons (dropout schematic)", ko),
+        fontsize=15,
+    )
+    fig.text(
+        0.5, 0.035,
+        L("연결선도 쉬는 뉴런과 함께 잠시 끊긴다. 다음 회차에는 다시 연결될 수 있다.",
+          "Connections to resting neurons pause too, and can return in the next step.", ko),
+        ha="center", fontsize=10.5, color=GRAY,
+    )
+    fig.tight_layout(rect=(0, 0.07, 1, 0.92))
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -395,6 +497,8 @@ def main() -> None:
          "훈련 · 검증 · 테스트 세 갈래 분할"),
         ("fig7-4-cross-validation.png", figure_cross_validation,
          "5조각 교차검증"),
+        ("fig7-5-dropout.png", figure_dropout,
+         "학습 회차와 예측 단계의 드롭아웃"),
     ]
 
     for filename, builder, description in targets:
