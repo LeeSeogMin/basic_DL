@@ -1,10 +1,11 @@
 """9장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 네 장이다.
+만드는 그림은 다섯 장이다.
   fig9-1  픽셀과 채널 - 흑백은 숫자 판 한 장, 컬러는 세 장
   fig9-2  합성곱 한 번의 계산 - 작은 창이 이미지 위를 훑으며 곱하고 더한다
   fig9-3  pooling - 크기를 줄이면서 강한 신호만 남긴다
   fig9-4  CNN의 층 순서 - 판의 크기와 장수가 층마다 어떻게 바뀌는가
+  fig9-5  실습 9.1 신경망의 일부 - 입력 64, 은닉 32, 출력 10 중 몇 개만 그린다
 
 이 그림들은 데이터 분석 결과가 아니라 개념 설명용 도식이다.
 숫자는 설명을 위해 손으로 고른 값이다.
@@ -16,7 +17,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyArrowPatch, Rectangle
+from matplotlib.patches import Circle, FancyArrowPatch, Rectangle
 
 import _krfont
 
@@ -511,6 +512,104 @@ def figure_cnn_structure(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------
+# 그림 9-5: 실습 9.1 신경망의 일부
+# ---------------------------------------------------------------------------
+
+def column_positions(n_top, n_bottom, y_top, step):
+    """위쪽 n_top개, 점 세 개 자리 하나, 아래쪽 n_bottom개의 y 좌표를 돌려준다."""
+    top = [y_top - i * step for i in range(n_top)]
+    dots = y_top - n_top * step
+    bottom = [dots - (i + 1) * step for i in range(n_bottom)]
+    return top, dots, bottom
+
+
+def figure_mlp_partial(ko: bool, out_path: Path) -> None:
+    """그림 9-5: 64 -> 32 -> 10 신경망에서 층마다 몇 개만 골라 그린다."""
+    L = _krfont.label
+    fig, ax = plt.subplots(figsize=(13.0, 7.0))
+    blank_axes(ax, (-0.6, 16.0), (-1.9, 7.4))
+
+    # 왼쪽: 8x8 이미지 자리
+    cell = 0.3
+    draw_grid(ax, -0.3, 2.0, cell, np.arange(64).reshape(8, 8),
+              facecolor="#E6E6E6", fontsize=5.5, textcolor="#555555")
+    ax.text(0.9, 4.65, L("8 x 8 이미지\n(칸 번호)", "8 x 8 image\n(cell numbers)", ko),
+            ha="center", fontsize=10.5)
+    arrow(ax, 2.3, 3.2, 3.5, 3.2)
+    ax.text(2.9, 3.5, L("펴기", "flatten", ko), ha="center", fontsize=10, color=GRAY)
+
+    r = 0.27
+    x_in, x_hid, x_out = 4.6, 9.0, 13.0
+    step = 0.95
+    in_top, in_dots, in_bot = column_positions(3, 2, 5.9, step)
+    hid_top, hid_dots, hid_bot = column_positions(3, 1, 5.4, step * 1.15)
+    out_top, out_dots, out_bot = column_positions(3, 1, 5.4, step * 1.15)
+
+    inputs = list(zip(in_top + in_bot, ["0", "1", "2", "62", "63"]))
+    hiddens = list(zip(hid_top + hid_bot, ["1", "2", "3", "32"]))
+    outputs = list(zip(out_top + out_bot, ["0", "1", "2", "9"]))
+
+    # 연결선: 그린 노드끼리 전부 잇고, 은닉 뉴런 1이 받는 선만 주황으로 강조한다
+    for yi, _ in inputs:
+        for k, (yh, _) in enumerate(hiddens):
+            color, lw, z = (ORANGE, 1.8, 2) if k == 0 else ("#C8C8C8", 0.8, 1)
+            ax.plot([x_in + r, x_hid - r], [yi, yh], color=color, linewidth=lw, zorder=z)
+    for yh, _ in hiddens:
+        for yo, _ in outputs:
+            ax.plot([x_hid + r, x_out - r], [yh, yo], color="#C8C8C8", linewidth=0.8, zorder=1)
+
+    def nodes(x, items, face, edge):
+        for y, _ in items:
+            ax.add_patch(Circle((x, y), r, facecolor=face, edgecolor=edge,
+                                linewidth=1.4, zorder=3))
+
+    nodes(x_in, inputs, "#E6E6E6", GRAY)
+    nodes(x_hid, hiddens, "#C9D7EA", BLUE)
+    nodes(x_out, outputs, "#CFE6C9", GREEN)
+    ax.add_patch(Circle((x_hid, hiddens[0][0]), r, facecolor="#FBD3A8",
+                        edgecolor=ORANGE, linewidth=2.0, zorder=4))
+
+    for y, name in inputs:
+        ax.text(x_in - r - 0.12, y, L(f"{name}번 칸", f"cell {name}", ko),
+                ha="right", va="center", fontsize=10)
+    for y, name in hiddens:
+        ax.text(x_hid, y, name, ha="center", va="center", fontsize=9.5, zorder=5)
+    for y, name in outputs:
+        ax.text(x_out + r + 0.15, y, L(f"숫자 {name}의 점수", f"score for {name}", ko),
+                ha="left", va="center", fontsize=10)
+    for x, y in [(x_in, in_dots), (x_hid, hid_dots), (x_out, out_dots)]:
+        ax.text(x, y, "⋮", ha="center", va="center", fontsize=20, color=GRAY)
+
+    ax.text(x_in, 6.75, L("입력 64개", "input 64", ko), ha="center", fontsize=12.5)
+    ax.text(x_hid, 6.75, L("은닉층 뉴런 32개", "hidden 32", ko), ha="center",
+            fontsize=12.5, color=BLUE)
+    ax.text(x_out, 6.75, L("출력 10개", "output 10", ko), ha="center",
+            fontsize=12.5, color=GREEN)
+
+    ax.text((x_in + x_hid) / 2, -0.55,
+            L("가중치 64 x 32 = 2,048개", "weights 64 x 32 = 2,048", ko),
+            ha="center", fontsize=11)
+    ax.text((x_hid + x_out) / 2, -0.55,
+            L("가중치 32 x 10 = 320개", "weights 32 x 10 = 320", ko),
+            ha="center", fontsize=11)
+    ax.text(x_hid + 0.45, hiddens[0][0] + 0.55,
+            L("뉴런 1은 64개를 전부 받는다\n(가중치 64개 + 편향 1개)",
+              "neuron 1 takes all 64\n(64 weights + 1 bias)", ko),
+            ha="left", va="bottom", fontsize=10, color=ORANGE)
+
+    ax.text(
+        7.7, -1.5,
+        L("층마다 일부만 그린 개념 도식이다. 입력 64개 중 5개, 은닉층 32개 중 4개, 출력 10개 중 4개를 그렸다.",
+          "Concept diagram showing only some nodes of each layer.", ko),
+        ha="center", fontsize=10, color=GRAY,
+    )
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -527,6 +626,8 @@ def main() -> None:
          "pooling이 하는 일"),
         ("fig9-4-cnn-structure.png", figure_cnn_structure,
          "CNN의 층 순서"),
+        ("fig9-5-mlp-partial.png", figure_mlp_partial,
+         "실습 9.1 신경망의 일부"),
     ]
 
     for filename, builder, description in targets:
