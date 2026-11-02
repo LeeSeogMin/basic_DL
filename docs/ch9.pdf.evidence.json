@@ -1,0 +1,9 @@
+{
+  "source_markdown": "docs\\ch9.md",
+  "source_sha256": "3a97a1ff1fbcfb1024ebd9bf2a1486202bb37db164958cc56863a9084e5ab00f",
+  "output_pdf": "docs\\ch9.pdf",
+  "output_bytes": 1471588,
+  "generated_at": "2026-11-02T09:43:51.205669+09:00",
+  "pandoc": "pandoc 3.9",
+  "browser": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+}

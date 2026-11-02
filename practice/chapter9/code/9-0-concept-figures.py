@@ -1,9 +1,10 @@
 """9장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 세 장이다.
+만드는 그림은 네 장이다.
   fig9-1  픽셀과 채널 - 흑백은 숫자 판 한 장, 컬러는 세 장
   fig9-2  합성곱 한 번의 계산 - 작은 창이 이미지 위를 훑으며 곱하고 더한다
   fig9-3  pooling - 크기를 줄이면서 강한 신호만 남긴다
+  fig9-4  CNN의 층 순서 - 판의 크기와 장수가 층마다 어떻게 바뀌는가
 
 이 그림들은 데이터 분석 결과가 아니라 개념 설명용 도식이다.
 숫자는 설명을 위해 손으로 고른 값이다.
@@ -429,6 +430,87 @@ def figure_pooling(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------
+# 그림 9-4: CNN의 층 순서
+# ---------------------------------------------------------------------------
+
+def stack(ax, x, y, size, count, color, gap=0.22):
+    """같은 크기의 판 count장을 비스듬히 겹쳐 그린다. 맨 앞 판의 왼쪽 아래가 (x, y)다."""
+    for i in reversed(range(count)):
+        ax.add_patch(
+            Rectangle(
+                (x + i * gap, y + i * gap), size, size,
+                facecolor=color, edgecolor="white", linewidth=1.4, alpha=0.9,
+            )
+        )
+
+
+def figure_cnn_structure(ko: bool, out_path: Path) -> None:
+    """그림 9-4: 8x8 입력에 필터 4개를 쓰는 작은 CNN의 층 순서."""
+    L = _krfont.label
+    fig, ax = plt.subplots(figsize=(13.0, 5.6))
+    blank_axes(ax, (-0.3, 16.2), (-2.6, 5.4))
+
+    # 입력 8x8 한 장
+    stack(ax, 0.0, 0.6, 2.4, 1, "#9E9E9E")
+    ax.text(1.2, 3.4, L("입력\n8x8, 1장", "input\n8x8, 1 sheet", ko),
+            ha="center", fontsize=11)
+
+    arrow(ax, 2.7, 1.8, 3.9, 1.8)
+    ax.text(3.3, 2.15, L("합성곱\n필터 4개", "conv\n4 filters", ko),
+            ha="center", fontsize=10, color=ORANGE)
+
+    # 합성곱 결과 6x6 네 장
+    stack(ax, 4.1, 0.6, 1.8, 4, "#F5B97A")
+    ax.text(5.35, 3.45, L("6x6, 4장\n필터 하나에 판 하나", "6x6, 4 sheets\none per filter", ko),
+            ha="center", fontsize=10.5)
+
+    arrow(ax, 6.9, 1.8, 8.1, 1.8)
+    ax.text(7.5, 2.15, L("ReLU\n2x2 pooling", "ReLU\n2x2 pooling", ko),
+            ha="center", fontsize=10, color=BLUE)
+
+    # pooling 결과 3x3 네 장
+    stack(ax, 8.3, 0.9, 0.9, 4, "#9CB8D8")
+    ax.text(9.1, 3.0, L("3x3, 4장", "3x3, 4 sheets", ko), ha="center", fontsize=10.5)
+
+    arrow(ax, 10.1, 1.8, 11.0, 1.8)
+    ax.text(10.55, 2.15, L("펴기", "flatten", ko), ha="center", fontsize=10, color=GRAY)
+
+    # 펴서 36개
+    for i in range(12):
+        ax.add_patch(Rectangle((11.2, 0.0 + i * 0.3), 0.3, 0.3,
+                               facecolor="#9CB8D8", edgecolor="white", linewidth=0.8))
+    ax.text(11.35, 3.9, L("숫자 36개", "36 numbers", ko), ha="center", fontsize=10.5)
+    ax.text(11.35, -0.35, "...", ha="center", fontsize=12, color=GRAY)
+
+    arrow(ax, 11.8, 1.8, 12.9, 1.8)
+    ax.text(12.35, 2.15, L("완전연결층", "dense", ko), ha="center", fontsize=10, color=GREEN)
+
+    for i in range(10):
+        ax.add_patch(Rectangle((13.1, 0.0 + i * 0.36), 0.36, 0.36,
+                               facecolor="#B7D9AE", edgecolor="white", linewidth=0.8))
+        ax.text(13.7, 0.18 + i * 0.36, str(i), va="center", fontsize=9, color="#333333")
+    ax.text(13.6, 3.9, L("숫자 0~9의\n점수 10개", "10 scores\nfor 0-9", ko),
+            ha="center", fontsize=10.5)
+
+    ax.text(
+        8.0, -1.35,
+        L("판 크기는 8 -> 6 -> 3으로 줄고, 판 장수는 1 -> 4로 는다. 학습으로 찾는 값은 필터 4개의 숫자 36개와 완전연결층의 가중치다.",
+          "Sheet size shrinks 8 -> 6 -> 3 while the number of sheets grows 1 -> 4.", ko),
+        ha="center", fontsize=10.5, color="#333333",
+    )
+    ax.text(
+        8.0, -2.15,
+        L("이 그림은 층 순서와 판 크기를 보여 주는 개념 도식이다.",
+          "Concept diagram of layer order and sheet sizes.", ko),
+        ha="center", fontsize=10, color=GRAY,
+    )
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -443,6 +525,8 @@ def main() -> None:
          "합성곱 한 번의 계산"),
         ("fig9-3-pooling.png", figure_pooling,
          "pooling이 하는 일"),
+        ("fig9-4-cnn-structure.png", figure_cnn_structure,
+         "CNN의 층 순서"),
     ]
 
     for filename, builder, description in targets:
