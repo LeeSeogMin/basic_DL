@@ -1,11 +1,12 @@
 """9장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 다섯 장이다.
+만드는 그림은 여섯 장이다.
   fig9-1  픽셀과 채널 - 흑백은 숫자 판 한 장, 컬러는 세 장
   fig9-2  합성곱 한 번의 계산 - 작은 창이 이미지 위를 훑으며 곱하고 더한다
   fig9-3  pooling - 크기를 줄이면서 강한 신호만 남긴다
   fig9-4  CNN의 층 순서 - 판의 크기와 장수가 층마다 어떻게 바뀌는가
   fig9-5  실습 9.1 신경망의 일부 - 입력 64, 은닉 32, 출력 10 중 몇 개만 그린다
+  fig9-6  컴퓨터 비전의 대표 작업 - 같은 장면에 분류·검출·분할·설명 생성의 출력
 
 이 그림들은 데이터 분석 결과가 아니라 개념 설명용 도식이다.
 숫자는 설명을 위해 손으로 고른 값이다.
@@ -610,6 +611,119 @@ def figure_mlp_partial(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------
+# 그림 9-6: 같은 장면, 다른 출력 - 컴퓨터 비전의 대표 작업
+# ---------------------------------------------------------------------------
+
+SCENE_COLORS = {          # 클래스 번호 -> (원본 장면 색, 분할 결과 색)
+    0: ("#CFE3F5", "#F4F4F4"),   # 하늘
+    1: ("#8C8C8C", "#B0B0B0"),   # 도로
+    2: ("#9CC98A", "#D5E8CC"),   # 풀밭
+    3: ("#6F87A3", BLUE),        # 자동차
+    4: ("#A8846A", ORANGE),      # 사람
+}
+
+
+def make_scene() -> np.ndarray:
+    """60x90 칸짜리 장면을 클래스 번호 판으로 만든다. 손으로 정한 도형이다."""
+    h, w = 60, 90
+    scene = np.zeros((h, w), dtype=int)          # 하늘
+    scene[30:, :] = 2                            # 풀밭
+    scene[38:54, :] = 1                          # 도로
+    scene[36:48, 12:46] = 3                      # 자동차 몸통
+    scene[29:37, 20:38] = 3                      # 자동차 지붕
+    yy, xx = np.mgrid[0:h, 0:w]
+    for cx in (19, 39):                          # 바퀴
+        scene[(yy - 48) ** 2 + (xx - cx) ** 2 <= 16] = 3
+    scene[(yy - 21) ** 2 + (xx - 67) ** 2 <= 12] = 4   # 사람 머리
+    scene[25:41, 64:71] = 4                      # 몸통
+    scene[41:53, 64:67] = 4                      # 다리
+    scene[41:53, 68:71] = 4
+    return scene
+
+
+def paint(scene: np.ndarray, which: int) -> np.ndarray:
+    """클래스 번호 판을 색 이미지로 바꾼다. which=0 원본 색, 1 분할 색."""
+    rgb = np.zeros(scene.shape + (3,))
+    for cls, colors in SCENE_COLORS.items():
+        rgb[scene == cls] = matplotlib_rgb(colors[which])
+    return rgb
+
+
+def matplotlib_rgb(hex_color: str) -> tuple[float, float, float]:
+    hex_color = hex_color.lstrip("#")
+    return tuple(int(hex_color[i:i + 2], 16) / 255 for i in (0, 2, 4))
+
+
+def bounding_box(scene: np.ndarray, cls: int) -> tuple[int, int, int, int]:
+    """클래스 칸을 모두 감싸는 가장 작은 상자 (x0, y0, x1, y1)."""
+    ys, xs = np.nonzero(scene == cls)
+    return xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
+
+
+def figure_vision_tasks(ko: bool, out_path: Path) -> None:
+    """그림 9-6: 같은 장면에 대해 네 작업이 내놓는 출력을 나란히 그린다."""
+    L = _krfont.label
+    scene = make_scene()
+    original = paint(scene, 0)
+
+    fig, axes = plt.subplots(1, 4, figsize=(15.0, 3.9))
+    titles = [
+        L("이미지 분류", "classification", ko),
+        L("객체 검출", "object detection", ko),
+        L("영상 분할", "segmentation", ko),
+        L("이미지 설명 생성", "captioning", ko),
+    ]
+    for ax, title in zip(axes, titles):
+        ax.set_title(title, fontsize=13, pad=10)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    # 1) 분류: 사진 전체에 이름표 하나
+    axes[0].imshow(original, interpolation="nearest")
+    axes[0].text(45, 57, L("출력: 도로 장면", "output: road scene", ko),
+                 ha="center", va="bottom", fontsize=11, color="white",
+                 bbox=dict(facecolor=GRAY, edgecolor="none", pad=3))
+
+    # 2) 검출: 물체마다 상자와 이름표
+    axes[1].imshow(original, interpolation="nearest")
+    for cls, name, color in ((3, L("자동차", "car", ko), BLUE),
+                             (4, L("사람", "person", ko), ORANGE)):
+        x0, y0, x1, y1 = bounding_box(scene, cls)
+        axes[1].add_patch(Rectangle((x0 - 1.5, y0 - 1.5), x1 - x0 + 2, y1 - y0 + 2,
+                                    facecolor="none", edgecolor=color, linewidth=2.6))
+        axes[1].text(x0 - 1.5, y0 - 2.5, name, fontsize=10.5, color="white",
+                     va="bottom", bbox=dict(facecolor=color, edgecolor="none", pad=2))
+
+    # 3) 분할: 픽셀마다 이름표 -> 색으로 칠한다
+    axes[2].imshow(paint(scene, 1), interpolation="nearest")
+    legend = [(3, L("자동차", "car", ko)), (4, L("사람", "person", ko)),
+              (1, L("도로", "road", ko)), (2, L("풀밭", "grass", ko)),
+              (0, L("하늘", "sky", ko))]
+    for i, (cls, name) in enumerate(legend):
+        axes[2].add_patch(Rectangle((2 + i * 17.5, 1.5), 4, 4,
+                                    facecolor=SCENE_COLORS[cls][1], edgecolor="#555555",
+                                    linewidth=0.6))
+        axes[2].text(7.0 + i * 17.5, 3.6, name, va="center", fontsize=9.5)
+
+    # 4) 설명 생성: 문장 한 줄
+    axes[3].imshow(original, interpolation="nearest")
+    axes[3].text(45, 2, L("출력: \"도로에 자동차가 있고\n옆에 사람이 서 있다\"",
+                           "output: \"a car on the road,\na person standing nearby\"", ko),
+                 ha="center", va="top", fontsize=10.5, color="white",
+                 bbox=dict(facecolor=GREEN, edgecolor="none", pad=3))
+
+    fig.text(
+        0.5, 0.02,
+        L("같은 장면을 넣어도 작업에 따라 출력이 다르다. 장면은 설명용으로 손으로 그린 도형이다.",
+          "Same input, different outputs. The scene is hand-drawn for illustration.", ko),
+        ha="center", fontsize=10.5, color=GRAY,
+    )
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -628,6 +742,8 @@ def main() -> None:
          "CNN의 층 순서"),
         ("fig9-5-mlp-partial.png", figure_mlp_partial,
          "실습 9.1 신경망의 일부"),
+        ("fig9-6-vision-tasks.png", figure_vision_tasks,
+         "컴퓨터 비전의 대표 작업"),
     ]
 
     for filename, builder, description in targets:
