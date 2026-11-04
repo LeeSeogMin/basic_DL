@@ -341,6 +341,8 @@ _출처: `practice/chapter9/results/9-1-flatten-classifier.log`_
 
 ### 4. 합성곱 신경망(CNN)의 계산
 
+https://app.notion.com/p/09-10522650bb8d48a193a5f6cbcae6da67
+
 평탄화 모델은 칸 번호마다 따로 가중치를 배운다. 그래서 실습 9.1에서 그림을 한 칸 밀자 정확도가 0.933에서 0.439로 떨어졌다. **합성곱 신경망**(Convolutional Neural Network, CNN)은 작은 필터 하나를 이미지의 모든 위치에 같은 방식으로 적용한다. CNN의 핵심은 **어떤 필터를 쓸지를 사람이 정하지 않고 학습으로 찾는다**는 데 있다.
 
 #### 4-1. 합성곱 연산
