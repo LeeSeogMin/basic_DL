@@ -360,6 +360,23 @@ def main() -> None:
               f"  (사람 정답 {'긍정' if tricky_label[i] else '부정'})")
         print()
 
+    # 첫 번째 문장의 확률이 어떻게 나왔는지 덧셈 하나하나까지 풀어 본다.
+    first = tricky_text[0]
+    first_seen = [tok for tok in dict.fromkeys(tokenize(first)) if tok in known]
+    intercept = float(model.intercept_[0])
+    z = intercept + sum(weight_of[tok] for tok in first_seen)
+    p_hand = 1 / (1 + np.exp(-z))
+    print("--- 첫 번째 문장의 확률을 손으로 계산한다 ---")
+    print(f"문장: {first}")
+    terms = " + ".join(f"({weight_of[tok]:+.3f})" for tok in first_seen)
+    print(f"  점수 z = 절편({intercept:+.3f}) + 아는 단어 가중치의 합 {terms}")
+    print(f"        = {z:+.3f}")
+    print(f"  긍정 확률 = 1 / (1 + e^(-z)) = 1 / (1 + e^({-z:+.3f})) = {p_hand:.3f}")
+    print(f"  모델이 직접 낸 확률(predict_proba): {tricky_prob[0]:.3f}")
+    print("  z가 0보다 크면 확률이 0.5를 넘어 긍정, 0보다 작으면 부정이다.")
+    print("  모르는 단어는 가중치가 없으므로 이 덧셈에 들어가지 않는다.")
+    print()
+
     tricky_table.to_csv(RESULTS_DIR / "confusing_sentences.csv",
                         index=False, encoding="utf-8-sig")
 

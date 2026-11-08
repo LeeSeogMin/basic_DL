@@ -1,10 +1,12 @@
 """실습 10.1 - 문장이 숫자로 바뀌는 과정을 단계별로 본다.
 
-네 단계로 진행한다.
+다섯 단계로 진행한다.
   1단계  문장을 토큰으로 쪼갠다
   2단계  단어 가방(bag of words) 표를 만들어 그대로 출력한다
-  3단계  TF-IDF로 바꾼 뒤 문장 사이 코사인 유사도를 잰다
+  3단계  코사인 유사도를 손으로 한 번 계산하고, TF-IDF로 바꾼 뒤 문장 사이 유사도를 계산한다
   4단계  TruncatedSVD로 2차원으로 줄여 평면에 점으로 찍는다
+  5단계  같은 문장에 함께 나온 이웃 단어를 세어 단어 벡터를 만들고,
+         단어가 안 겹치던 문장 짝의 유사도가 어떻게 바뀌는지 본다
 
 주의: 여기 쓰는 문장은 실제 리뷰가 아니라 수업용으로 직접 쓴 합성 문장이다.
 인터넷에서 데이터나 모델을 내려받지 않는다. scikit-learn만 쓴다.
@@ -46,6 +48,54 @@ MY_SENTENCES = [
 # 컴퓨터가 이 짝을 얼마나 닮았다고 보는지 3단계에서 따로 출력한다.
 # MY_SENTENCES를 바꾸면 이 번호도 같이 바꾼다.
 MEANING_PAIRS = [(1, 3), (4, 6)]
+
+# 3단계에서 코사인 유사도를 손으로 풀어 볼 문장 짝(번호)
+HAND_PAIR = (2, 3)
+
+# ---------------------------------------------------------------------------
+# 학생이 바꾸는 곳 2: 5단계에서 단어 벡터를 만들 때 쓰는 문장.
+# 단어의 뜻을 "같은 문장에 함께 나온 이웃 단어"로 나타낸다.
+# "배송이"와 "택배가"는 한 문장에 같이 나오지 않게 썼다. 대신 "하루", "도착했어요",
+# "빨라요" 같은 이웃을 나눠 갖게 썼다. 이웃을 나눠 갖도록 문장을 고른 것은 사람이다.
+# 실제 임베딩은 이런 문장을 수억 개 모아 같은 계산을 한다.
+# ---------------------------------------------------------------------------
+CONTEXT_SENTENCES = [
+    "배송이 정말 빨라요",
+    "배송이 하루 만에 왔어요",
+    "배송이 늦게 도착했어요",
+    "배송이 빨라서 좋아요",
+    "배송이 이틀 걸렸어요",
+    "택배가 하루 만에 도착했어요",
+    "택배가 정말 빨라요",
+    "택배가 늦게 왔어요",
+    "택배가 문 앞에 도착했어요",
+    "화면이 밝고 선명해요",
+    "화면이 아주 선명해요",
+    "화면이 어두워서 아쉬워요",
+    "화면이 크고 또렷해요",
+    "액정이 밝고 또렷해요",
+    "액정이 크고 선명해요",
+    "액정이 어두워서 불편해요",
+    "배터리가 하루 만에 닳아요",
+    "배터리가 오래 가요",
+    "배터리가 빨리 닳아요",
+    "배터리가 금방 닳아요",
+    "가격이 너무 비싸요",
+    "가격이 저렴해서 좋아요",
+]
+
+# 5단계에서 비교할 단어 짝
+WORD_PAIRS = [("배송이", "택배가"), ("화면이", "액정이"), ("배송이", "화면이")]
+
+# 5단계에서 비교할 MY_SENTENCES의 문장 짝(번호)과 그 짝을 고른 이유
+SENTENCE_PAIRS = [
+    ((1, 3), "뜻이 같다"),
+    ((4, 6), "뜻이 같다"),
+    ((1, 4), "뜻이 다르다"),
+    ((3, 7), "뜻이 다르다"),
+]
+
+EMBED_DIM = 3           # 단어 벡터의 길이. 이웃 단어 수(수십 개)를 이 길이로 줄인다.
 
 RANDOM_SEED = 42
 
@@ -119,16 +169,44 @@ def step2_bag_of_words() -> pd.DataFrame:
 
 
 def step3_similarity() -> np.ndarray:
-    """3단계: TF-IDF로 바꾼 뒤 문장 사이 코사인 유사도를 잰다."""
+    """3단계: 코사인 유사도를 손으로 한 번 풀고, TF-IDF 유사도 표를 만든다."""
+    print("=== 3단계. 코사인 유사도를 손으로 한 번 계산한다 ===")
+    a, b = HAND_PAIR
+    tokens_a = sorted(set(tokenize(MY_SENTENCES[a - 1])))
+    tokens_b = sorted(set(tokenize(MY_SENTENCES[b - 1])))
+    shared = [t for t in tokens_a if t in tokens_b]
+    hand = len(shared) / np.sqrt(len(tokens_a) * len(tokens_b))
+    print(f"  문장{a}: {MY_SENTENCES[a - 1]}   -> 1이 찍힌 칸 {len(tokens_a)}개")
+    print(f"  문장{b}: {MY_SENTENCES[b - 1]}   -> 1이 찍힌 칸 {len(tokens_b)}개")
+    print(f"  두 문장에 모두 1이 찍힌 칸(겹친 단어): {len(shared)}개 "
+          f"({', '.join(shared) if shared else '없음'})")
+    print("  코사인 유사도 = 같은 칸끼리 곱해 더한 값 / (각 줄의 길이를 곱한 값)")
+    print(f"              = {len(shared)} / (√{len(tokens_a)} x √{len(tokens_b)})"
+          f" = {len(shared)} / {np.sqrt(len(tokens_a) * len(tokens_b)):.2f}"
+          f" = {hand:.2f}")
+    print("  0과 1만 있는 줄이면 '겹친 단어 수 / √(단어 수 x 단어 수)'와 같다.")
+    print()
+
     vectorizer = TfidfVectorizer(tokenizer=tokenize, token_pattern=None, lowercase=False)
     tfidf = vectorizer.fit_transform(MY_SENTENCES)
     similarity = cosine_similarity(tfidf)
+    vocab = list(vectorizer.get_feature_names_out())
 
     names = [f"문장{i}" for i in range(1, len(MY_SENTENCES) + 1)]
     table = pd.DataFrame(similarity.round(2), index=names, columns=names)
 
     print("=== 3단계. TF-IDF와 코사인 유사도 ===")
     print("TF-IDF는 흔한 단어의 무게를 낮추고 드문 단어의 무게를 높인다.")
+    print(f"문장{a}의 TF-IDF 칸 값(0이 아닌 칸만, 줄의 길이를 1로 맞춘 값)")
+    row = tfidf[a - 1].toarray()[0]
+    for idx in np.argsort(-row):
+        if row[idx] == 0:
+            break
+        count = sum(vocab[idx] in tokenize(s) for s in MY_SENTENCES)
+        print(f"  {vocab[idx]:<6} {row[idx]:.2f}   (이 단어가 나온 문장 {count}개)")
+    print(f"단어 가방으로 계산한 문장{a}-문장{b} 유사도는 {hand:.2f}, "
+          f"TF-IDF로 계산하면 {similarity[a - 1, b - 1]:.2f}로 바뀐다.")
+    print()
     print("코사인 유사도는 0에 가까울수록 안 닮았고, 1에 가까울수록 닮았다.")
     print()
     print(table.to_string())
@@ -160,13 +238,13 @@ def step3_similarity() -> np.ndarray:
         score = similarity[a - 1, b - 1]
         print(f"  문장{a}: {MY_SENTENCES[a - 1]}")
         print(f"  문장{b}: {MY_SENTENCES[b - 1]}")
-        print(f"  -> 컴퓨터가 잰 유사도: {score:.2f}")
+        print(f"  -> 컴퓨터가 계산한 유사도: {score:.2f}")
         print()
 
     table.to_csv(RESULTS_DIR / "sentence_similarity.csv", encoding="utf-8-sig")
     print("유사도 표는 results/sentence_similarity.csv 에 저장했다.")
     print()
-    return tfidf
+    return tfidf, similarity
 
 
 def step4_map(tfidf, ko: bool) -> None:
@@ -266,6 +344,121 @@ def step4_map(tfidf, ko: bool) -> None:
     print()
 
 
+def step5_word_vectors(tfidf_similarity: np.ndarray, ko: bool) -> None:
+    """5단계: 이웃 단어를 세어 단어 벡터를 만들고, 문장 유사도를 다시 계산한다."""
+    L = _krfont.label
+
+    print("=== 5단계. 이웃 단어로 단어 벡터 만들기 ===")
+    print(f"단어 벡터용 문장(CONTEXT_SENTENCES): {len(CONTEXT_SENTENCES)}개, 직접 쓴 합성 문장")
+
+    counter = CountVectorizer(tokenizer=tokenize, token_pattern=None,
+                              lowercase=False, binary=True)
+    x = counter.fit_transform(CONTEXT_SENTENCES)
+    words = list(counter.get_feature_names_out())
+    index = {w: i for i, w in enumerate(words)}
+
+    # (단어 x 단어) 표: 두 단어가 같은 문장에 함께 나온 문장 수
+    together = (x.T @ x).toarray().astype(float)
+    np.fill_diagonal(together, 0)
+    print(f"서로 다른 단어 {len(words)}개 -> 이웃 표 {len(words)}행 x {len(words)}열")
+    print("단어 하나 = 이웃 표의 한 줄 = 그 단어와 같은 문장에 나온 단어들의 횟수")
+    print()
+
+    print("--- 이웃 표에서 두 단어의 줄을 비교한다 ---")
+    for w1, w2 in WORD_PAIRS:
+        if w1 not in index or w2 not in index:
+            print(f"  {w1}-{w2}: CONTEXT_SENTENCES에 없는 단어가 있다. WORD_PAIRS를 고칠 것.")
+            continue
+        r1, r2 = together[index[w1]], together[index[w2]]
+        n1 = [words[j] for j in np.nonzero(r1)[0]]
+        n2 = [words[j] for j in np.nonzero(r2)[0]]
+        common = [w for w in n1 if w in n2]
+        sim = cosine_similarity([r1], [r2])[0, 0]
+        print(f"  {w1} - {w2}")
+        print(f"    같은 문장에 함께 나온 횟수: {int(together[index[w1], index[w2]])}회")
+        print(f"    {w1}의 이웃 {len(n1)}개, {w2}의 이웃 {len(n2)}개, 공유한 이웃 {len(common)}개"
+              f" ({', '.join(common) if common else '없음'})")
+        print(f"    두 줄의 코사인 유사도: {sim:.2f}")
+    print()
+
+    svd = TruncatedSVD(n_components=EMBED_DIM, random_state=RANDOM_SEED)
+    vectors = svd.fit_transform(together)
+    print(f"--- 이웃 표의 한 줄({len(words)}칸)을 TruncatedSVD로 {EMBED_DIM}칸으로 줄인다 ---")
+    for w in ("배송이", "택배가", "화면이"):
+        if w in index:
+            nums = ", ".join(f"{v:+.2f}" for v in vectors[index[w]])
+            print(f"  {w:<5} -> [{nums}]")
+    for w1, w2 in WORD_PAIRS:
+        if w1 in index and w2 in index:
+            sim = cosine_similarity(vectors[[index[w1]]], vectors[[index[w2]]])[0, 0]
+            print(f"  {w1} - {w2} 단어 벡터 유사도: {sim:.2f}")
+    print()
+
+    def sentence_vector(text: str) -> tuple[np.ndarray | None, list[str]]:
+        known = [t for t in tokenize(text) if t in index]
+        if not known:
+            return None, known
+        return np.mean([vectors[index[t]] for t in known], axis=0), known
+
+    print("--- 문장 벡터 = 문장에 든 단어 벡터의 평균 ---")
+    print(f"{'짝':<10}{'사람 판단':<10}{'TF-IDF':>8}{'단어 벡터':>10}")
+    rows = []
+    for (a, b), why in SENTENCE_PAIRS:
+        if not (1 <= a <= len(MY_SENTENCES) and 1 <= b <= len(MY_SENTENCES)):
+            print(f"  문장{a}-문장{b}는 문장 번호 범위를 벗어났다. SENTENCE_PAIRS를 고칠 것.")
+            continue
+        va, _ = sentence_vector(MY_SENTENCES[a - 1])
+        vb, _ = sentence_vector(MY_SENTENCES[b - 1])
+        if va is None or vb is None:
+            print(f"  문장{a}-문장{b}: CONTEXT_SENTENCES에 아는 단어가 없는 문장이 있다.")
+            continue
+        emb = cosine_similarity([va], [vb])[0, 0]
+        tf = tfidf_similarity[a - 1, b - 1]
+        rows.append((f"{a}-{b}", why, tf, emb))
+        print(f"문장{a}-문장{b:<4}{why:<10}{tf:>8.2f}{emb:>10.2f}")
+    for a in sorted({n for (pair, _) in SENTENCE_PAIRS for n in pair}):
+        if 1 <= a <= len(MY_SENTENCES):
+            _, known = sentence_vector(MY_SENTENCES[a - 1])
+            missing = [t for t in tokenize(MY_SENTENCES[a - 1]) if t not in index]
+            note = f", 단어 벡터가 없는 단어: {', '.join(missing)}" if missing else ""
+            print(f"  문장{a} {MY_SENTENCES[a - 1]} -> 평균에 쓴 단어 {len(known)}개{note}")
+    print()
+    print("주의: 이웃을 공유하도록 문장을 고른 것은 사람이다. 이 결과는 계산 방식을 보여줄 뿐,")
+    print("컴퓨터가 스스로 뜻을 알아낸 증거가 아니다.")
+    print()
+
+    if not rows:
+        return
+    fig, ax = plt.subplots(figsize=(9.5, 5.2))
+    y = np.arange(len(rows))
+    ax.barh(y - 0.2, [r[2] for r in rows], height=0.38, color=GRAY,
+            label=L("TF-IDF (단어가 겹쳐야 닮음)", "TF-IDF (needs shared words)", ko))
+    ax.barh(y + 0.2, [r[3] for r in rows], height=0.38, color=BLUE,
+            label=L("이웃 단어 벡터 (이웃이 겹쳐도 닮음)", "neighbor word vectors", ko))
+    for i, r in enumerate(rows):
+        ax.text(max(r[2], 0) + 0.02, i - 0.2, f"{r[2]:.2f}", va="center", fontsize=9.5)
+        ax.text(max(r[3], 0) + 0.02, i + 0.2, f"{r[3]:.2f}", va="center", fontsize=9.5)
+    ax.set_yticks(y)
+    ax.set_yticklabels([L(f"문장{r[0]} ({r[1]})", f"pair {r[0]}", ko) for r in rows],
+                       fontsize=10.5)
+    ax.invert_yaxis()
+    ax.set_xlim(-0.05, 1.15)
+    ax.set_xlabel(L("코사인 유사도", "cosine similarity", ko), fontsize=10.5)
+    ax.set_title(L("같은 문장 짝을 두 방법으로 비교 (직접 만든 합성 문장)",
+                   "Same sentence pairs, two methods (synthetic sentences)", ko),
+                 fontsize=12, loc="left", pad=10)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2,
+              fontsize=9.5, frameon=False)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+    fig.tight_layout()
+    out_path = RESULTS_DIR / "word_vectors.png"
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+    print(f"비교 그림: results/{out_path.name}")
+    print()
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -278,12 +471,15 @@ def main() -> None:
 
     step1_tokens()
     step2_bag_of_words()
-    tfidf = step3_similarity()
+    tfidf, tfidf_similarity = step3_similarity()
     step4_map(tfidf, ko)
+    step5_word_vectors(tfidf_similarity, ko)
 
     print("=== 정리 ===")
     print("단어 가방은 단어가 겹칠 때만 두 문장을 닮았다고 본다.")
     print("뜻이 같아도 단어가 다르면 유사도가 0이 된다. 이 한계가 임베딩이 필요한 이유다.")
+    print("이웃 단어로 만든 단어 벡터는 겹치는 단어가 없어도 이웃이 같으면 가깝게 놓는다.")
+    print("대신 이웃을 공유하기만 하면 뜻이 반대인 문장도 가깝게 놓는다.")
 
 
 if __name__ == "__main__":

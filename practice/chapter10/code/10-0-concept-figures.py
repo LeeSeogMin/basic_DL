@@ -1,9 +1,10 @@
 """10장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 세 장이다.
+만드는 그림은 네 장이다.
   fig10-1  문장이 토큰으로 쪼개지고 숫자 벡터가 되기까지의 흐름
   fig10-2  단어 가방 표의 모양(행이 문장, 열이 단어)
   fig10-3  비슷한 뜻의 문장이 가까이 모이는 평면
+  fig10-4  코사인 유사도 = 두 화살표가 이루는 각도
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
 그림에 쓰인 문장은 모두 직접 만든 합성 문장이다.
@@ -14,6 +15,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 import _krfont
@@ -247,6 +249,50 @@ def figure_sentence_space(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
+def figure_cosine(ko: bool, out_path: Path) -> None:
+    """그림 10-4: 코사인 유사도는 두 화살표가 같은 쪽을 가리키는 정도다(개념 도식).
+
+    단어가 두 개뿐인 사전을 가정한다. 가로축은 "배송이", 세로축은 "하루"가 나온 횟수다.
+    화살표 좌표는 설명을 위해 손으로 정한 값이다. 실험 결과가 아니다.
+    """
+    L = _krfont.label
+    cases = [
+        ((2, 1), (4, 2), L("같은 단어를 같은 비율로", "same words, same ratio", ko)),
+        ((2, 1), (1, 2), L("단어가 일부 겹친다", "some overlap", ko)),
+        ((2, 0), (0, 2), L("겹치는 단어가 없다", "no shared word", ko)),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(12.0, 4.4))
+    for ax, (a, b, title) in zip(axes, cases):
+        a_vec, b_vec = np.array(a, float), np.array(b, float)
+        cos = a_vec @ b_vec / (np.linalg.norm(a_vec) * np.linalg.norm(b_vec))
+        # 긴 화살표 B를 먼저 그리고 A를 위에 그린다. 방향이 같아도 A가 가려지지 않는다.
+        for vec, color, name, width, dy in ((b_vec, ORANGE, "B", 5.0, 0.12),
+                                             (a_vec, BLUE, "A", 2.4, -0.38)):
+            ax.annotate("", xy=vec, xytext=(0, 0),
+                        arrowprops=dict(arrowstyle="-|>", color=color, linewidth=width))
+            if vec[1] == 0:
+                dy = 0.15   # 가로로 누운 화살표는 이름을 위에 적어 축과 겹치지 않게 한다
+            ax.text(vec[0] + 0.12, vec[1] + dy, f"{name} {tuple(int(v) for v in vec)}",
+                    color=color, fontsize=11)
+        ax.set_xlim(-0.3, 5.0)
+        ax.set_ylim(-0.3, 3.2)
+        ax.set_aspect("equal")
+        ax.set_xlabel(L("'배송이' 횟수", "count of word 1", ko), fontsize=10)
+        ax.set_ylabel(L("'하루' 횟수", "count of word 2", ko), fontsize=10)
+        ax.set_title(f"{title}\n" + L(f"코사인 유사도 = {cos:.2f}",
+                                       f"cosine similarity = {cos:.2f}", ko),
+                     fontsize=11.5, loc="left")
+        for spine in ("top", "right"):
+            ax.spines[spine].set_visible(False)
+    fig.suptitle(
+        L("코사인 유사도는 두 화살표가 같은 쪽을 가리키는 정도다 (좌표는 손으로 정한 값)",
+          "Cosine similarity = how much two arrows point the same way (hand-picked)", ko),
+        fontsize=12.5, x=0.02, ha="left")
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.savefig(out_path, dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     ko = _krfont.setup()
@@ -261,6 +307,8 @@ def main() -> None:
          "단어 가방 표의 생김새"),
         ("fig10-3-sentence-space.png", figure_sentence_space,
          "뜻이 비슷한 문장이 가까이 모이는 평면"),
+        ("fig10-4-cosine.png", figure_cosine,
+         "코사인 유사도 = 두 화살표가 이루는 각도"),
     ]
 
     for filename, builder, description in targets:
