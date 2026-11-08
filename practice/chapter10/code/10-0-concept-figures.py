@@ -1,10 +1,9 @@
 """10장 이론 강의용 개념 그림을 만든다.
 
-만드는 그림은 네 장이다.
+만드는 그림은 세 장이다.
   fig10-1  문장이 토큰으로 쪼개지고 숫자 벡터가 되기까지의 흐름
   fig10-2  단어 가방 표의 모양(행이 문장, 열이 단어)
-  fig10-3  비슷한 뜻의 문장이 가까이 모이는 평면
-  fig10-4  코사인 유사도 = 두 화살표가 이루는 각도
+  fig10-3  자연어 처리의 발전 과정(연표)
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
 그림에 쓰인 문장은 모두 직접 만든 합성 문장이다.
@@ -15,7 +14,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 import _krfont
@@ -186,109 +184,60 @@ def figure_bag_of_words(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
-def figure_sentence_space(ko: bool, out_path: Path) -> None:
-    """그림 10-3: 뜻이 비슷한 문장이 가까이 놓이는 평면(개념 도식)."""
-    L = _krfont.label
-    fig, ax = plt.subplots(figsize=(9.0, 6.0))
+def figure_nlp_history(ko: bool, out_path: Path) -> None:
+    """그림 10-3: 자연어 처리의 발전 과정(연표).
 
-    # 좌표는 개념 설명을 위해 손으로 정한 값이다. 실험 결과가 아니다.
-    groups = [
-        (BLUE, L("배송 이야기", "about delivery", ko), [
-            (1.5, 4.6, L("배송이 빨라요", "delivery was fast", ko)),
-            (2.1, 4.1, L("하루 만에 왔어요", "it arrived in a day", ko)),
-            (1.2, 3.9, L("택배가 금방 도착", "the parcel came quickly", ko)),
-        ]),
-        (ORANGE, L("화면 이야기", "about the screen", ko), [
-            (4.6, 1.7, L("화면이 선명해요", "the screen is sharp", ko)),
-            (5.2, 1.2, L("액정이 또렷해요", "the display is crisp", ko)),
-            (4.2, 1.1, L("화질이 좋아요", "great picture quality", ko)),
-        ]),
-        (GREEN, L("가격 이야기", "about the price", ko), [
-            (5.0, 4.5, L("가격이 비싸요", "it is expensive", ko)),
-            (5.6, 4.0, L("값이 너무 높아요", "the price is too high", ko)),
-        ]),
-    ]
-
-    for color, group_name, points in groups:
-        xs = [p[0] for p in points]
-        ys = [p[1] for p in points]
-        ax.scatter(xs, ys, s=190, color=color, edgecolor="white",
-                   linewidth=1.5, zorder=3, label=group_name)
-        for x, y, text in points:
-            ax.text(x, y - 0.30, text, ha="center", va="top",
-                    fontsize=10, color="#333333", zorder=4)
-
-    # 화살표가 설명 글자를 가로지르지 않도록, 글자는 화살표 아래쪽 빈자리에 둔다.
-    ax.annotate(
-        "", xy=(4.4, 2.0), xytext=(2.6, 3.3),
-        arrowprops=dict(arrowstyle="<->", color=RED, linewidth=1.6,
-                        linestyle=(0, (4, 3))),
-    )
-    ax.text(2.3, 2.4,
-            L("뜻이 다르면\n멀리 떨어진다", "different meaning\n-> far apart", ko),
-            ha="left", va="center", fontsize=10.5, color=RED, linespacing=1.5)
-
-    ax.set_xlim(0, 7.2)
-    ax.set_ylim(0, 5.6)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_xlabel(L("가로축(뜻을 요약한 첫 번째 축)",
-                    "axis 1 (a summary direction of meaning)", ko), fontsize=10.5)
-    ax.set_ylabel(L("세로축(두 번째 축)", "axis 2", ko), fontsize=10.5)
-    ax.set_title(
-        L("뜻이 비슷한 문장은 가까이 모인다 (개념 도식, 좌표는 손으로 정한 값)",
-          "Sentences with similar meaning sit close together (schematic, hand-placed)", ko),
-        fontsize=13, pad=12, loc="left",
-    )
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.10), ncol=3, frameon=False)
-    for spine in ("top", "right"):
-        ax.spines[spine].set_visible(False)
-
-    fig.tight_layout()
-    fig.savefig(out_path, dpi=160)
-    plt.close(fig)
-
-
-def figure_cosine(ko: bool, out_path: Path) -> None:
-    """그림 10-4: 코사인 유사도는 두 화살표가 같은 쪽을 가리키는 정도다(개념 도식).
-
-    단어가 두 개뿐인 사전을 가정한다. 가로축은 "배송이", 세로축은 "하루"가 나온 횟수다.
-    화살표 좌표는 설명을 위해 손으로 정한 값이다. 실험 결과가 아니다.
+    연도와 사건은 본문 각주의 출처에서 확인한 것이다.
+    가로 간격은 연도에 비례하지 않는다. 사건을 같은 간격으로 늘어놓았다.
     """
     L = _krfont.label
-    cases = [
-        ((2, 1), (4, 2), L("같은 단어를 같은 비율로", "same words, same ratio", ko)),
-        ((2, 1), (1, 2), L("단어가 일부 겹친다", "some overlap", ko)),
-        ((2, 0), (0, 2), L("겹치는 단어가 없다", "no shared word", ko)),
+    events = [
+        ("1954", L("조지타운-IBM\n기계번역 실험", "Georgetown-IBM", ko)),
+        ("1966", L("ELIZA\n대화 프로그램", "ELIZA", ko)),
+        (L("1990년대~", "1990s-", ko), L("통계 번역\n단어 가방·TF-IDF", "statistical MT", ko)),
+        ("2013", L("word2vec\n단어 임베딩", "word2vec", ko)),
+        ("2014", L("seq2seq\nRNN 번역", "seq2seq", ko)),
+        ("2017", L("트랜스포머", "Transformer", ko)),
+        ("2018", "BERT"),
+        ("2020", "GPT-3"),
+        ("2021", L("KLUE\n한국어 평가", "KLUE", ko)),
+        ("2022", "ChatGPT"),
     ]
-    fig, axes = plt.subplots(1, 3, figsize=(12.0, 4.4))
-    for ax, (a, b, title) in zip(axes, cases):
-        a_vec, b_vec = np.array(a, float), np.array(b, float)
-        cos = a_vec @ b_vec / (np.linalg.norm(a_vec) * np.linalg.norm(b_vec))
-        # 긴 화살표 B를 먼저 그리고 A를 위에 그린다. 방향이 같아도 A가 가려지지 않는다.
-        for vec, color, name, width, dy in ((b_vec, ORANGE, "B", 5.0, 0.12),
-                                             (a_vec, BLUE, "A", 2.4, -0.38)):
-            ax.annotate("", xy=vec, xytext=(0, 0),
-                        arrowprops=dict(arrowstyle="-|>", color=color, linewidth=width))
-            if vec[1] == 0:
-                dy = 0.15   # 가로로 누운 화살표는 이름을 위에 적어 축과 겹치지 않게 한다
-            ax.text(vec[0] + 0.12, vec[1] + dy, f"{name} {tuple(int(v) for v in vec)}",
-                    color=color, fontsize=11)
-        ax.set_xlim(-0.3, 5.0)
-        ax.set_ylim(-0.3, 3.2)
-        ax.set_aspect("equal")
-        ax.set_xlabel(L("'배송이' 횟수", "count of word 1", ko), fontsize=10)
-        ax.set_ylabel(L("'하루' 횟수", "count of word 2", ko), fontsize=10)
-        ax.set_title(f"{title}\n" + L(f"코사인 유사도 = {cos:.2f}",
-                                       f"cosine similarity = {cos:.2f}", ko),
-                     fontsize=11.5, loc="left")
-        for spine in ("top", "right"):
-            ax.spines[spine].set_visible(False)
-    fig.suptitle(
-        L("코사인 유사도는 두 화살표가 같은 쪽을 가리키는 정도다 (좌표는 손으로 정한 값)",
-          "Cosine similarity = how much two arrows point the same way (hand-picked)", ko),
-        fontsize=12.5, x=0.02, ha="left")
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    eras = [
+        (0, 1, BLUE, L("규칙 기반", "rule-based", ko),
+         L("사람이 규칙과 사전을 적는다", "hand-written rules", ko)),
+        (2, 2, ORANGE, L("통계 기반", "statistical", ko),
+         L("단어 횟수를 센다", "count words", ko)),
+        (3, 4, GREEN, L("신경망·임베딩", "neural", ko),
+         L("단어를 실수 벡터로", "word vectors", ko)),
+        (5, 9, RED, L("트랜스포머·대규모 언어모델", "Transformer / LLM", ko),
+         L("큰 말뭉치로 먼저 배우고 일에 맞춘다", "pretrain, then adapt", ko)),
+    ]
+    fig, ax = plt.subplots(figsize=(12.0, 3.6))
+    ax.set_xlim(-0.6, len(events) - 0.4)
+    ax.set_ylim(1.2, 5.0)
+    ax.axis("off")
+
+    for i0, i1, color, name, desc in eras:
+        ax.add_patch(FancyBboxPatch((i0 - 0.45, 3.5), i1 - i0 + 0.9, 1.3,
+                                    boxstyle="round,pad=0.02,rounding_size=0.15",
+                                    facecolor=color, edgecolor="none", alpha=0.9))
+        ax.text((i0 + i1) / 2, 4.38, name, ha="center", va="center",
+                fontsize=11.5, color="white")
+        ax.text((i0 + i1) / 2, 3.88, desc, ha="center", va="center",
+                fontsize=9, color="white")
+
+    ax.plot([-0.5, len(events) - 0.5], [3.0, 3.0], color=GRAY, linewidth=1.5)
+    for i, (year, text) in enumerate(events):
+        ax.plot([i], [3.0], "o", color="#333333", markersize=5)
+        ax.text(i, 2.75, year, ha="center", va="top", fontsize=10.5, color="#333333")
+        ax.text(i, 2.2, text, ha="center", va="top", fontsize=9, color="#333333",
+                linespacing=1.4)
+
+    ax.set_title(L("자연어 처리의 발전 과정 (가로 간격은 연도에 비례하지 않는다)",
+                   "A short history of NLP (spacing is not to scale)", ko),
+                 fontsize=13, loc="left", pad=8)
+    fig.tight_layout()
     fig.savefig(out_path, dpi=160)
     plt.close(fig)
 
@@ -305,10 +254,8 @@ def main() -> None:
          "문장에서 숫자 벡터까지의 네 단계"),
         ("fig10-2-bag-of-words.png", figure_bag_of_words,
          "단어 가방 표의 생김새"),
-        ("fig10-3-sentence-space.png", figure_sentence_space,
-         "뜻이 비슷한 문장이 가까이 모이는 평면"),
-        ("fig10-4-cosine.png", figure_cosine,
-         "코사인 유사도 = 두 화살표가 이루는 각도"),
+        ("fig10-3-nlp-history.png", figure_nlp_history,
+         "자연어 처리의 발전 과정"),
     ]
 
     for filename, builder, description in targets:
