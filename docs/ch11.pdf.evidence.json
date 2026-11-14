@@ -1,0 +1,9 @@
+{
+  "source_markdown": "docs/ch11.md",
+  "source_sha256": "288de0f9079c328e317ddbd84f11f9c19bad94061e2e04e6851caedf6c406d77",
+  "output_pdf": "docs/ch11.pdf",
+  "output_bytes": 1448061,
+  "generated_at": "2026-11-11T12:37:06.452040+09:00",
+  "pandoc": "pandoc 3.9.0.2",
+  "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+}
