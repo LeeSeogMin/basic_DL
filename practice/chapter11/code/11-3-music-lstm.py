@@ -48,7 +48,12 @@ def main() -> None:
     _krfont.report(ko)
     rng = np.random.default_rng(SEED)
     if OUT_DIR.exists():
-        shutil.rmtree(OUT_DIR)            # 이전 실행의 후보를 지우고 새로 만든다
+        try:
+            shutil.rmtree(OUT_DIR)        # 이전 실행의 후보를 지우고 새로 만든다
+        except PermissionError as error:  # Windows는 다른 프로그램이 연 파일을 지우지 못한다
+            print(f"이전 후보 파일을 지우지 못했다: {error.filename}")
+            print("음악 재생기나 작곡 프로그램에서 results/my_song/ 의 파일을 닫고 다시 실행한다.")
+            raise SystemExit(1) from error
     OUT_DIR.mkdir(parents=True)
 
     print("=== 실습 11.3  내 멜로디로 새 곡 만들기 ===")
@@ -60,14 +65,14 @@ def main() -> None:
     songs, names = _music.load_folder_or_file(DATA_DIR / MUSIC_DIR)
     vocab, index = _music.build_vocab(songs)
     songs_idx = [[index[t] for t in song] for song in songs]
-    print(f"[1] 학습 곡 읽기 — {len(songs)}곡, 음표 {sum(map(len, songs))}개, "
+    print(f"[1] 학습 곡 읽기 - {len(songs)}곡, 음표 {sum(map(len, songs))}개, "
           f"서로 다른 음표 {len(vocab)}개")
     for name, song in zip(names, songs):
         print(f"  {name:<28} {len(song):3d}음  {' '.join(song[:6])} ...")
     print()
 
     # 2단계 ------------------------------------------------------------------
-    print("[2] LSTM 학습 — 곡마다 '다음 음표 맞히기'를 반복한다")
+    print("[2] LSTM 학습 - 곡마다 '다음 음표 맞히기'를 반복한다")
     model = _music.TinyLSTM(len(vocab), HIDDEN, rng)
     losses = model.train(songs_idx, EPOCHS, LEARNING_RATE, rng)
     print()
@@ -79,7 +84,7 @@ def main() -> None:
         raise SystemExit(f"시작 멜로디의 {missing}는 학습 곡에 없는 음표입니다. "
                          f"쓸 수 있는 음표: {' '.join(vocab)}")
     prompt = [index[t] for t in prompt_tokens]
-    print(f"[3] 후보 만들기 — 시작 멜로디: {' '.join(prompt_tokens)}")
+    print(f"[3] 후보 만들기 - 시작 멜로디: {' '.join(prompt_tokens)}")
 
     rows, rolls = [], {}
     number = 0
@@ -99,7 +104,7 @@ def main() -> None:
     print()
 
     # 4단계 ------------------------------------------------------------------
-    print("[4] 후보 비교 — 학습 곡을 얼마나 그대로 따라갔는가")
+    print("[4] 후보 비교 - 학습 곡을 얼마나 그대로 따라갔는가")
     print("  후보            온도   4음 일치율   가장 긴 복사 구간   길이")
     for stem, t, ratio, longest, seconds in rows:
         print(f"  {stem:<14} {t:4.1f}   {ratio:>6}%     {longest:3d}음            {seconds}초")

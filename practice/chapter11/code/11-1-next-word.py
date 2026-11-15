@@ -156,7 +156,7 @@ def main() -> None:
         print("  " + ", ".join(vocab))
         raise SystemExit(1)
 
-    print("[1] 빈도표 — 앞 단어 뒤에 어떤 단어가 몇 번 나왔는가")
+    print("[1] 빈도표 - 앞 단어 뒤에 어떤 단어가 몇 번 나왔는가")
     print_count_table(vocab, counts, START_WORD)
     print()
     print_count_table(vocab, counts, "월요일에")

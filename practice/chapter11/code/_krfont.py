@@ -9,10 +9,17 @@
 
 from __future__ import annotations
 
+import sys
+
 import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 
+
+# Windows에서 실행 결과를 파일로 넘기면(python 파일.py > log.txt) 출력이 cp949로 저장된다.
+# cp949에 없는 글자(일부 기호)가 있으면 프로그램이 멈추므로, 그런 글자만 ?로 바꿔 계속 진행한다.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(errors="replace")
 
 # 운영체제별로 흔히 설치된 한글 폰트 후보
 KOREAN_FONT_CANDIDATES = [
