@@ -132,8 +132,8 @@ def figure_next_token_loop(ko: bool, out_path: Path) -> None:
     ax = axes[1]
     blank_axes(ax, xlim=(0, 10), ylim=(0, 4.2))
     ax.set_title(
-        L("이 일을 다섯 번 되풀이하면 문장 하나가 나온다",
-          "Repeat five times and a sentence appears", ko),
+        L("이 일을 네 번 되풀이하면 문장 하나가 나온다",
+          "Repeat four times and a sentence appears", ko),
         fontsize=13, pad=10, loc="left",
     )
 
