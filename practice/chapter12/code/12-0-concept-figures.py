@@ -2,8 +2,8 @@
 
 만드는 그림은 세 장이다.
   fig12-1  자동완성과 코딩 에이전트가 맡는 범위 비교
-  fig12-2  큰 요구 하나를 작업 단위로 쪼개는 방법
-  fig12-3  AI에게 맡긴 일과 사람이 책임지는 일의 경계
+  fig12-2  권한 설정 세 단계
+  fig12-3  저장 지점을 만들고, 기록을 보고, 되돌리는 순서
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
 외부 서비스에 접속하지 않는다. 그림 파일만 만든다.
@@ -149,105 +149,95 @@ def figure_autocomplete_vs_agent(ko: bool, out_path: Path) -> None:
     plt.close(fig)
 
 
-def figure_task_breakdown(ko: bool, out_path: Path) -> None:
-    """그림 12-2: 큰 요구를 작업 단위로 쪼갠다."""
+def figure_permission_levels(ko: bool, out_path: Path) -> None:
+    """그림 12-2: 권한 설정 세 단계."""
     L = _krfont.label
-    fig, ax = plt.subplots(figsize=(10.0, 6.0))
-    blank_axes(ax, xlim=(0, 10), ylim=(0, 6.6))
+    fig, ax = plt.subplots(figsize=(10.0, 5.6))
+    blank_axes(ax, xlim=(0, 10), ylim=(0, 6.2))
 
     ax.set_title(
-        L("큰 요구 한 줄을 확인 가능한 작업 네 개로 쪼갠다",
-          "Split one big request into four checkable tasks", ko),
+        L("권한 설정 세 단계 — 넓힐수록 묻는 횟수가 줄고, 확인 없이 실행되는 일이 늘어난다",
+          "Three permission levels: wider means fewer questions and more unchecked actions", ko),
         fontsize=13, pad=10, loc="left",
     )
 
-    box(ax, 0.6, 5.0, 8.8, 0.95,
-        L("\"폴더를 정리해 주는 도구를 만들어 줘\"  ← 확인할 방법이 없는 요구",
-          "\"Build me a folder tidy-up tool\"  <- no way to check it", ko),
-        RED, 12)
-
-    tasks = [
-        (L("① 폴더 안 파일\n목록을 읽는다",
-           "1. list files\nin the folder", ko),
-         L("확인: 파일 수가\n실제와 같은가", "check: file count\nmatches", ko)),
-        (L("② 확장자별로 개수와\n용량을 센다",
-           "2. count and size\nby extension", ko),
-         L("확인: 용량 합이\n전체와 같은가", "check: sizes add up\nto the total", ko)),
-        (L("③ 표로 출력한다",
-           "3. print a table", ko),
-         L("확인: 표에 빠진\n확장자가 없는가", "check: no extension\nis missing", ko)),
-        (L("④ 막대그래프를\n그린다",
-           "4. draw a bar chart", ko),
-         L("확인: 그림 파일이\n실제로 생겼는가", "check: the image file\nexists", ko)),
+    levels = [
+        (L("읽기 전용", "read-only", ko), GREEN,
+         L("파일을 읽기만 한다\n고치거나 지우지 못한다",
+           "can only read files\ncannot edit or delete", ko),
+         L("쓰는 때: 처음 보는 폴더를\n살펴보게 할 때",
+           "use when: exploring\nan unfamiliar folder", ko)),
+        (L("작업 폴더 쓰기", "workspace-write", ko), ORANGE,
+         L("맡긴 폴더 안에서만 고친다\n폴더 밖·삭제·인터넷은 묻는다",
+           "edits only inside the folder\nasks for outside, delete, network", ko),
+         L("쓰는 때: 평소 작업",
+           "use when: everyday work", ko)),
+        (L("전부 허용", "allow all", ko), RED,
+         L("아무것도 묻지 않는다\n삭제와 전송도 바로 실행한다",
+           "asks nothing\ndeletes and uploads at once", ko),
+         L("쓰는 때: 지워져도 되는\n격리된 환경에서만",
+           "use when: only in an isolated\nthrowaway environment", ko)),
     ]
 
-    xs = [0.1, 2.6, 5.1, 7.6]
-    w = 2.3
-    for x, (title, check) in zip(xs, tasks):
-        arrow(ax, 5.0, 4.95, x + w / 2, 3.95)
-        box(ax, x, 2.5, w, 1.4, title, BLUE, 10.5)
-        ax.text(x + w / 2, 1.75, check,
-                ha="center", va="center", fontsize=10, color="#333333",
-                linespacing=1.5)
+    xs = [0.2, 3.5, 6.8]
+    w = 3.0
+    for x, (name, color, can, when) in zip(xs, levels):
+        box(ax, x, 4.3, w, 0.95, name, color, 13)
+        ax.text(x + w / 2, 3.35, can, ha="center", va="center",
+                fontsize=10.5, color="#333333", linespacing=1.6)
+        ax.text(x + w / 2, 2.05, when, ha="center", va="center",
+                fontsize=10.5, color=GRAY, linespacing=1.6)
+    for x in xs[:-1]:
+        arrow(ax, x + w + 0.05, 4.78, x + w + 0.27, 4.78)
 
-    ax.text(5.0, 0.75,
-            L("작업 하나가 끝날 때마다 맞는지 확인할 수 있으면, 어디서 틀렸는지 바로 찾는다.\n"
-              "네 작업을 한꺼번에 맡기면, 틀렸을 때 어느 단계가 문제인지 알 수 없다.",
-              "If each task can be checked, you find the broken step immediately.\n"
-              "If all four go at once, you cannot tell which step failed.", ko),
-            ha="center", fontsize=10.5, color=GRAY, linespacing=1.7)
+    ax.text(5.0, 0.6,
+            L("규칙 파일에 적은 문장은 부탁이다. 권한 설정은 실제로 막는 장치다.",
+              "A sentence in a rules file is a request. A permission setting actually blocks.", ko),
+            ha="center", fontsize=11.5, color=BLUE)
 
     fig.tight_layout()
     fig.savefig(out_path, dpi=160)
     plt.close(fig)
 
 
-def figure_responsibility(ko: bool, out_path: Path) -> None:
-    """그림 12-3: 맡긴 일과 책임지는 일의 경계."""
+def figure_savepoint(ko: bool, out_path: Path) -> None:
+    """그림 12-3: 저장 지점을 만들고, 기록을 보고, 되돌린다."""
     L = _krfont.label
-    fig, ax = plt.subplots(figsize=(10.0, 6.2))
-    blank_axes(ax, xlim=(0, 10), ylim=(0, 7.2))
+    fig, ax = plt.subplots(figsize=(10.0, 5.2))
+    blank_axes(ax, xlim=(0, 10), ylim=(0, 5.8))
 
     ax.set_title(
-        L("맡길 수 있는 일과 넘길 수 없는 일",
-          "What can be delegated and what cannot", ko),
+        L("맡기기 전에 저장 지점을 만들고, 맡긴 뒤에 기록을 본다",
+          "Save a point before delegating; read the record afterwards", ko),
         fontsize=13, pad=10, loc="left",
     )
 
-    ax.plot([5.0, 5.0], [0.9, 6.5], color="#333333", linewidth=2.2)
-
-    box(ax, 0.2, 5.7, 4.4, 0.8,
-        L("AI에게 맡길 수 있는 일", "Can be delegated to AI", ko), GREEN, 12)
-    box(ax, 5.4, 5.7, 4.4, 0.8,
-        L("사람이 책임지는 일", "Stays with the human", ko), BLUE, 12)
-
-    left_items = [
-        L("비슷한 코드를 여러 벌 만들기", "writing repetitive code", ko),
-        L("문법 오류 찾아 고치기", "fixing syntax errors", ko),
-        L("함수 이름과 주석 다듬기", "naming and comments", ko),
-        L("형식 변환 같은 반복 작업", "repetitive conversions", ko),
-    ]
-    right_items = [
-        L("무엇을 만들지 정하기", "deciding what to build", ko),
-        L("어떤 데이터를 쓸지 정하기", "choosing the data", ko),
-        L("실행해도 되는지 판단하기", "deciding whether to run it", ko),
-        L("결과가 맞는지 확인하기", "checking the result", ko),
-        L("틀렸을 때 책임지기", "owning the mistake", ko),
+    steps = [
+        (L("① 저장 지점\n만들기", "1. make a\nsave point", ko), BLUE,
+         L("지금 상태를\n따로 남긴다", "keep the\ncurrent state", ko)),
+        (L("② 에이전트에게\n맡기기", "2. hand over\nto the agent", ko), GREEN,
+         L("파일이 만들어지고\n고쳐지고 지워진다", "files are created,\nedited, deleted", ko)),
+        (L("③ 기록 보기", "3. read the\nrecord", ko), BLUE,
+         L("바뀐 파일 목록을\n보고와 대조한다", "compare changed files\nwith the report", ko)),
+        (L("④ 받아들이거나\n되돌리기", "4. accept or\nroll back", ko), BLUE,
+         L("틀렸으면 ①로\n돌아간다", "if wrong, go\nback to 1", ko)),
     ]
 
-    for i, text in enumerate(left_items):
-        y = 5.05 - 0.62 * i
-        ax.text(0.35, y, "•  " + text, ha="left", va="center",
-                fontsize=11, color="#333333")
-    for i, text in enumerate(right_items):
-        y = 5.05 - 0.62 * i
-        ax.text(5.55, y, "•  " + text, ha="left", va="center",
-                fontsize=11, color="#333333")
+    xs = [0.1, 2.6, 5.1, 7.6]
+    w = 2.3
+    for x, (title, color, note) in zip(xs, steps):
+        box(ax, x, 3.2, w, 1.4, title, color, 11)
+        ax.text(x + w / 2, 2.45, note, ha="center", va="center",
+                fontsize=10.5, color="#333333", linespacing=1.6)
+    for x in xs[:-1]:
+        arrow(ax, x + w + 0.03, 3.9, x + w + 0.19, 3.9)
 
-    ax.text(5.0, 0.35,
-            L("AI가 코드를 썼어도, 그 코드를 실행해서 생긴 결과는 실행 버튼을 누른 사람의 결과다.",
-              "Even if the AI wrote the code, the result belongs to whoever ran it.", ko),
-            ha="center", fontsize=11.5, color=RED)
+    ax.text(5.0, 0.95,
+            L("되돌릴 수 없는 것: 인터넷으로 나간 데이터, 저장 지점 밖에 있던 파일.\n"
+              "파란 칸은 사람이 하고, 초록 칸만 에이전트가 한다.",
+              "Cannot be undone: data already sent out, files outside the save point.\n"
+              "Blue steps are the human's; only the green step is the agent's.", ko),
+            ha="center", fontsize=10.5, color=RED, linespacing=1.7)
 
     fig.tight_layout()
     fig.savefig(out_path, dpi=160)
@@ -264,10 +254,10 @@ def main() -> None:
     targets = [
         ("fig12-1-autocomplete-vs-agent.png", figure_autocomplete_vs_agent,
          "자동완성과 코딩 에이전트가 맡는 범위"),
-        ("fig12-2-task-breakdown.png", figure_task_breakdown,
-         "큰 요구를 작업 단위로 쪼개기"),
-        ("fig12-3-responsibility-line.png", figure_responsibility,
-         "맡긴 일과 책임지는 일의 경계"),
+        ("fig12-2-permission-levels.png", figure_permission_levels,
+         "권한 설정 세 단계"),
+        ("fig12-3-savepoint.png", figure_savepoint,
+         "저장 지점과 되돌리기"),
     ]
 
     for filename, builder, description in targets:
