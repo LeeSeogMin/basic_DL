@@ -1,9 +1,9 @@
 {
   "source_markdown": "docs/ch12.md",
-  "source_sha256": "d2140458bdfe9b884fad41ec6ac08b309b16158066ac671dc3a90623fa54293b",
+  "source_sha256": "6ca372a910be2c811497ecb29adba19b53506d795ecbf6e432c1d6a159363792",
   "output_pdf": "docs/ch12.pdf",
-  "output_bytes": 1390540,
-  "generated_at": "2026-11-23T01:46:04.495335+09:00",
+  "output_bytes": 1517044,
+  "generated_at": "2026-11-23T10:02:57.204553+09:00",
   "pandoc": "pandoc 3.9.0.2",
   "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 }

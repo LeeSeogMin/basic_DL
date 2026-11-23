@@ -33,19 +33,20 @@ from matplotlib.ticker import MaxNLocator
 import _krfont
 
 # ===================== 학생이 바꿔 볼 값 =====================
-WORKSPACE = "my-project"      # 에이전트에게 맡긴 작업 폴더 이름
+WORKSPACE = "basic_DL"        # 에이전트에게 맡긴 작업 폴더 이름. 이 수업 저장소의 폴더 이름이다
 NETWORK_ALLOWED = False       # True 로 바꾸면 "작업 폴더 쓰기" 설정에서 인터넷 명령을 묻지 않는다
 
 # 에이전트가 실행하려는 명령 목록(합성 예제).
 # (동작, 대상, 설명) 순서다. 동작은 읽기·쓰기·삭제·전송·설치 다섯 가지다.
+# 1·2·5·6·7번의 대상은 이 저장소에 실제로 있는 파일과 폴더이고, 3·4번은 새로 만들 파일이다.
 COMMANDS = [
-    ("읽기", "my-project/README.md",              "안내 파일을 읽는다"),
-    ("읽기", "my-project/data/scores.csv",        "점수 표를 읽는다"),
-    ("쓰기", "my-project/report.py",              "새 코드 파일을 만든다"),
-    ("쓰기", "my-project/results/chart.png",      "그림을 저장한다"),
-    ("쓰기", "my-project/data/scores.csv",        "원본 점수 표를 덮어쓴다"),
-    ("삭제", "my-project/results/old_chart.png",  "예전 그림을 지운다"),
-    ("삭제", "my-project/data",                   "데이터 폴더를 통째로 지운다"),
+    ("읽기", "basic_DL/AGENTS.md",                "저장소 규칙 파일을 읽는다"),
+    ("읽기", "basic_DL/docs/ch12.md",             "12장 본문을 읽는다"),
+    ("쓰기", "basic_DL/count_lines.py",           "새 코드 파일을 만든다"),
+    ("쓰기", "basic_DL/docs/ch12_lines.png",      "그림을 저장한다"),
+    ("쓰기", "basic_DL/docs/ch12.md",             "12장 본문 원본을 덮어쓴다"),
+    ("삭제", "basic_DL/docs/ch12.pdf",            "예전 PDF를 지운다"),
+    ("삭제", "basic_DL/.git",                     "변경 이력 폴더를 통째로 지운다"),
     ("읽기", "~/.ssh/id_rsa",                     "작업 폴더 밖의 비밀키 파일을 읽는다"),
     ("쓰기", "~/.zshrc",                          "작업 폴더 밖의 설정 파일을 고친다"),
     ("삭제", "~/Documents",                       "작업 폴더 밖의 문서 폴더를 지운다"),
@@ -93,25 +94,25 @@ def print_table(headers: list[str], rows: list[list[str]], right: set[int] | Non
 
 
 # ---------------------------------------------------------------- 판정 규칙
-def is_inside(target: str) -> bool:
+def is_inside(target: str, workspace: str = WORKSPACE) -> bool:
     """대상 경로가 작업 폴더 안에 있는지 글자로만 확인한다. 실제 파일은 건드리지 않는다."""
     parts = PurePosixPath(target).parts
-    return bool(parts) and parts[0] == WORKSPACE
+    return bool(parts) and parts[0] == workspace
 
 
-def is_risky(action: str, target: str, note: str) -> bool:
+def is_risky(action: str, target: str, note: str, workspace: str = WORKSPACE) -> bool:
     """되돌리기 어렵거나 밖으로 새는 명령인지 표시한다.
 
     삭제·전송·설치, 작업 폴더 밖을 건드리는 명령, 원본을 덮어쓰는 명령을 위험으로 본다.
     """
     if action in ("삭제", "전송", "설치"):
         return True
-    if action in ("읽기", "쓰기") and not is_inside(target):
+    if action in ("읽기", "쓰기") and not is_inside(target, workspace):
         return True
     return "덮어" in note
 
 
-def decide(setting: str, action: str, target: str) -> str:
+def decide(setting: str, action: str, target: str, workspace: str = WORKSPACE) -> str:
     """권한 설정 하나에서 명령 하나를 어떻게 처리할지 정한다."""
     if action not in ("읽기", "쓰기", "삭제", "전송", "설치"):
         raise ValueError(f"모르는 동작입니다: {action}")
@@ -120,7 +121,7 @@ def decide(setting: str, action: str, target: str) -> str:
         return RUN                       # 아무것도 묻지 않는다
 
     uses_network = action in ("전송", "설치")
-    inside = (not uses_network) and is_inside(target)
+    inside = (not uses_network) and is_inside(target, workspace)
 
     if setting == "읽기 전용":
         if action == "읽기":
@@ -135,13 +136,15 @@ def decide(setting: str, action: str, target: str) -> str:
     return ASK                           # 삭제와 작업 폴더 밖은 사람에게 묻는다
 
 
-def build_table() -> pd.DataFrame:
+def build_table(commands: list[tuple[str, str, str]] = COMMANDS,
+                workspace: str = WORKSPACE) -> pd.DataFrame:
+    """명령 목록을 작업 폴더 기준으로 판정해 표로 만든다."""
     rows = []
-    for number, (action, target, note) in enumerate(COMMANDS, start=1):
+    for number, (action, target, note) in enumerate(commands, start=1):
         row = {"번호": number, "동작": action, "대상": target, "설명": note,
-               "위험": "예" if is_risky(action, target, note) else "아니오"}
+               "위험": "예" if is_risky(action, target, note, workspace) else "아니오"}
         for setting in SETTINGS:
-            row[setting] = decide(setting, action, target)
+            row[setting] = decide(setting, action, target, workspace)
         rows.append(row)
     return pd.DataFrame(rows)
 
