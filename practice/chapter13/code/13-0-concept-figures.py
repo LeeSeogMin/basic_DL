@@ -6,8 +6,8 @@
   fig13-3  남이 실행하지 못하는 코드와 남이 실행할 수 있는 코드
 
 이 그림들은 실험 결과가 아니라 개념 설명용 도식이다.
-실제 수치는 실습 13.1과 13.2에서 잰다.
-확신 기준선의 맞바꿈은 지어낸 곡선으로 그리지 않고, 실습 13.2에서 실제로 세어 그린다.
+그림 안의 숫자는 화면 문구를 보이려고 적은 예시다.
+실제 수치는 실습 13.1과 13.2의 로그에서 인용한다.
 """
 
 from __future__ import annotations
@@ -167,9 +167,9 @@ def figure_output_honesty(ko: bool, out_path: Path) -> None:
     ax.text(2.45, 5.75, L("이렇게 쓰지 않는다", "Do not write it this way", ko),
             ha="center", fontsize=12, color=RED)
     bad_lines = [
-        L("결과: 스팸입니다", "Result: this is spam", ko),
-        L("정확도 96%의 AI가 판정했습니다", "Judged by a 96%-accurate AI", ko),
-        L("믿고 삭제하세요", "You can safely delete it", ko),
+        L("결과: 대여가 많은 날입니다", "Result: a busy day", ko),
+        L("정확도 높은 AI가 판정했습니다", "Judged by a highly accurate AI", ko),
+        L("자전거를 더 배치하세요", "Add more bikes now", ko),
     ]
     for i, line in enumerate(bad_lines):
         ax.text(0.6, 4.85 - i * 0.75, line, ha="left", fontsize=11, color="#333333")
@@ -187,13 +187,13 @@ def figure_output_honesty(ko: bool, out_path: Path) -> None:
     ax.text(7.55, 5.75, L("이렇게 쓴다", "Write it this way", ko),
             ha="center", fontsize=12, color=GREEN)
     good_lines = [
-        L("스팸일 확률 0.82", "Probability of spam: 0.82", ko),
-        L("판단에 쓴 값: 링크 7개, 대문자 32%",
-          "Values used: 7 links, 32% caps", ko),
+        L("대여가 많은 날일 확률 0.82 (AI 예측)", "Probability of a busy day: 0.82 (AI)", ko),
+        L("판단에 쓴 값: 기온 19도, 비 0mm",
+          "Values used: 19 C, 0 mm rain", ko),
         L("이 모델이 틀릴 수 있는 경우:",
           "This model can be wrong when:", ko),
-        L("  합성 메일로만 배웠고, 한국어", "  trained on synthetic mail only,", ko),
-        L("  광고 메일은 본 적이 없다", "  never saw Korean ad mail", ko),
+        L("  기온 3~26도인 날만 보고 배웠다.", "  trained on days of 3-26 C only;", ko),
+        L("  그보다 더운 날은 본 적이 없다", "  never saw hotter days", ko),
     ]
     for i, line in enumerate(good_lines):
         ax.text(5.7, 4.85 - i * 0.55, line, ha="left", fontsize=10.5, color="#333333")
