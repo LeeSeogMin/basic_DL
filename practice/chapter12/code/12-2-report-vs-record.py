@@ -4,7 +4,9 @@
 보고는 에이전트가 쓴 글이고, 실제 변경은 파일에 남는다. 둘이 같다는 보장은 없다.
 이 코드는 둘을 따로 구해 한 줄씩 대조한다.
 
-[입력]  practice/chapter12/sample_folder/ (합성 예제 폴더, 파일 11개)
+[입력]  practice/chapter12/sample_folder/ (합성 예제 폴더, 파일 12개)
+        사회조사방법론 수강생이 시험 준비와 설문 프로젝트를 관리하는 폴더를 흉내 냈다.
+        TASK           사용자가 에이전트에게 맡긴 일(합성)
         AGENT_ACTIONS  에이전트가 했다고 가정한 작업 목록(합성)
         AGENT_REPORT   에이전트가 썼다고 가정한 최종 보고(합성)
         실제 AI를 호출하지 않는다. 두 목록 모두 사람이 미리 적어 둔 것이다.
@@ -36,21 +38,24 @@ import _krfont
 # ===================== 학생이 바꿔 볼 값 =====================
 USE_SAVEPOINT = True          # False 로 바꾸면 저장 지점 없이 작업을 시작한다
 
+# 사용자가 에이전트에게 맡긴 일(합성 예제).
+TASK = "설문 응답을 정리해서 보고서 초안의 결과 절을 채워 줘"
+
 # 에이전트가 복사본 폴더에서 한 작업(합성 예제). (종류, 경로) 순서다.
 AGENT_ACTIONS = [
-    ("생성", "summary.md"),
-    ("수정", "data/scores.csv"),
-    ("수정", "config.json"),
-    ("삭제", "logs/train_run1.log"),
-    ("삭제", "notes/todo.md"),
+    ("생성", "project/results_summary.md"),
+    ("수정", "project/report_draft.md"),
+    ("수정", "project/data/responses_raw.csv"),
+    ("삭제", "project/analysis_old.py"),
+    ("삭제", "exam/wrong_answers.md"),
 ]
 
 # 에이전트가 일을 마치고 쓴 최종 보고(합성 예제). (종류, 경로) 순서다.
 AGENT_REPORT = [
-    ("생성", "summary.md"),
-    ("수정", "data/scores.csv"),
-    ("삭제", "logs/train_run1.log"),
-    ("수정", "README.txt"),
+    ("생성", "project/results_summary.md"),
+    ("수정", "project/report_draft.md"),
+    ("삭제", "project/analysis_old.py"),
+    ("수정", "README.md"),
 ]
 # ============================================================
 
@@ -222,6 +227,7 @@ def main() -> None:
 
         before = snapshot(work)
         print("=== 1. 작업 전 ===")
+        print(f"맡긴 일: {TASK}")
         print(f"복사본 폴더의 파일 수: {len(before)}개")
         print(f"저장 지점: {'만들었다' if USE_SAVEPOINT else '만들지 않았다'}")
         print()
