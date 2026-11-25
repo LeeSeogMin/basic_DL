@@ -48,11 +48,10 @@ AI 도구는 학생이 수업 중 직접 쓴다. 이 장의 실습 코드는 AI�
 ### 실습 12.2 — 종합실습: 내 과목 폴더에 안전한 작업 환경을 만든다 (오늘의 과제)
 
 - 대상: 학생이 `sample_folder`(사회조사방법론 수강생 폴더를 흉내 낸 합성 예제, 파일 12개)를 수업 저장소 밖 `my_course`로 복사한 것. 기록은 옆 폴더 `submit_12`에 모은다
-- 순서(7단계): 1 저장 지점(첫 커밋, 에이전트에게 시킴) → 2 규칙 파일 AGENTS.md(에이전트) → 3 권한 설정(사람이 직접, 표 12.7 도구별: VS Code Copilot·Antigravity·TRAE) → 4 하네스 check.py(명세 네 칸으로 에이전트에게 시킴, 검사 3개) → 5 예제 코드로 기록 대조 보기 → 6 실제로 일을 맡기고 기록 읽기 → 7 `git restore`로 되돌리고 재검사
-- 5단계 예제 코드: `practice/chapter12/code/12-2-report-vs-record.py`. 맡긴 일 1문장(`TASK`), 합성 작업 5건·보고 4건. 빠진 변경은 설문 원본 응답 수정과 오답 노트 삭제. 원본 `sample_folder`는 건드리지 않는다. 학생 조작 지점: `USE_SAVEPOINT`, `AGENT_ACTIONS`, `AGENT_REPORT`. 산출물 `results/report_vs_record.png`, `results/change_table.csv`
-- 본문 인용 규칙: 1~4·6~7단계는 학생마다 결과가 달라 본문에 결과를 싣지 않는다. 실행 결과는 5단계 예제 코드의 로그에서만 인용한다
-- 과제: 텍스트 기록 6개(`1_git_log` ~ `6_check_after_restore`) + 사진 2장(A 권한 설정 화면, B 에이전트 최종 보고). PASS·FAIL은 채점하지 않는다
-- 도구별 권한 설정 출처: VS Code 승인 문서, Antigravity 권한 문서, TRAE 자동 실행 문서(2026-11-25 확인)
+- 순서(6단계): 1 저장 지점(첫 커밋, 에이전트에게 시킴) → 2 규칙 파일 AGENTS.md(에이전트) → 3 하네스 check.py(명세 네 칸으로 에이전트에게 시킴, 검사 3개) → 4 예제 코드로 기록 대조 보기 → 5 실제로 일을 맡기고 기록 읽기 → 6 `git restore`로 되돌리고 재검사. 권한 설정 단계는 2026-11-25 사용자 결정으로 뺐다(도구 기본값으로 삭제·전송을 묻고, 학생 환경 설정을 바꾸지 않기 위해)
+- 4단계 예제 코드: `practice/chapter12/code/12-2-report-vs-record.py`. 맡긴 일 1문장(`TASK`), 합성 작업 5건·보고 4건. 빠진 변경은 설문 원본 응답 수정과 오답 노트 삭제. 원본 `sample_folder`는 건드리지 않는다. 학생 조작 지점: `USE_SAVEPOINT`, `AGENT_ACTIONS`, `AGENT_REPORT`. 산출물 `results/report_vs_record.png`, `results/change_table.csv`
+- 본문 인용 규칙: 1~3·5~6단계는 학생마다 결과가 달라 본문에 결과를 싣지 않는다. 실행 결과는 4단계 예제 코드의 로그에서만 인용한다
+- 과제: 텍스트 기록 6개(`1_git_log` ~ `6_check_after_restore`) + 사진 1장(에이전트 최종 보고 화면). PASS·FAIL은 채점하지 않는다
 
 ### 개념 그림 생성
 
@@ -103,6 +102,6 @@ python scripts/run_and_capture.py 12 --verify
 
 ## 8. 책임 있는 AI 체크
 
-`docs/ch12.md`의 `### 책임 있는 AI 체크` 절에 맡기기 전·맡긴 뒤·제출 전 점검 표(표 12.8)를 둔다.
+`docs/ch12.md`의 `### 책임 있는 AI 체크` 절에 맡기기 전·맡긴 뒤·제출 전 점검 표(표 12.7)를 둔다.
 
 점검 항목: 명세 네 칸, 권한 설정과 작업 폴더의 키·개인정보 파일, 저장 지점, 기록 읽기와 직접 실행, AI 사용 사실 표기
